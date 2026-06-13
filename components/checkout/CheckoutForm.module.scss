@@ -1,0 +1,256 @@
+@use "@/styles/abstracts/variables" as *;
+
+.checkout {
+  display: grid;
+  gap: 1.05rem;
+}
+
+.grid {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 980px) {
+  .grid {
+    grid-template-columns: minmax(0, 1.42fr) minmax(22rem, 1fr);
+    align-items: start;
+  }
+}
+
+.left,
+.right {
+  display: grid;
+  gap: 1rem;
+}
+
+.panel,
+.totals {
+  padding: 1rem;
+  border: 1px solid #e7ded8;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 12px 30px rgba(17, 24, 39, 0.04);
+}
+
+.panel h2 {
+  margin: 0 0 0.9rem;
+  border-left: 3px solid #cc8780;
+  padding-left: 0.45rem;
+  font-size: 1rem;
+}
+
+.reviewItem {
+  display: grid;
+  grid-template-columns: 4.2rem 1fr auto;
+  gap: 0.9rem;
+  align-items: center;
+}
+
+.thumb {
+  position: relative;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border: 1px solid #e7ded8;
+  border-radius: 6px;
+  background: #fffaf7;
+}
+
+.thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 0.25rem;
+}
+
+.thumb span {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+  color: $primary-color;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.qtyRow {
+  display: inline-flex;
+  gap: 0.4rem;
+  align-items: center;
+  margin-top: 0.35rem;
+}
+
+.qtyRow button {
+  width: 1.55rem;
+  height: 1.55rem;
+  border: 0;
+  border-radius: 50%;
+  background: rgba($primary-color, 0.13);
+  color: $primary-color;
+  font-weight: 900;
+}
+
+.fields {
+  display: grid;
+  gap: 0.75rem;
+}
+
+@media (min-width: 720px) {
+  .fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .fields input:nth-child(3),
+  .fields input:nth-child(4) {
+    grid-column: 1 / -1;
+  }
+}
+
+.fields input,
+.fields select,
+.fullControl,
+.panel textarea {
+  width: 100%;
+  min-height: 2.55rem;
+  border: 1px solid #d8d1ca;
+  border-radius: 5px;
+  background: #fff;
+  padding: 0.7rem;
+  font: inherit;
+}
+
+.methodGrid {
+  display: grid;
+  gap: 0.65rem;
+}
+
+@media (min-width: 680px) {
+  .methodGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.method {
+  display: flex;
+  min-height: 2.55rem;
+  align-items: center;
+  gap: 0.55rem;
+  border: 1px solid #d8d1ca;
+  border-radius: 5px;
+  padding: 0.55rem 0.7rem;
+  cursor: pointer;
+}
+
+.activeMethod {
+  border-color: $primary-color;
+  background: rgba($primary-color, 0.11);
+}
+
+.emptyMethod {
+  margin: 0;
+  border: 1px dashed rgba($primary-color, 0.38);
+  border-radius: 6px;
+  background: rgba($primary-color, 0.08);
+  padding: 0.85rem;
+  color: $primary-color;
+  font-weight: 800;
+}
+
+.autoMethod {
+  display: flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border: 1px solid rgba($primary-color, 0.42);
+  border-radius: 6px;
+  background: rgba($primary-color, 0.1);
+  padding: 0.7rem 0.85rem;
+}
+
+.autoMethod span {
+  color: $color-ink;
+  font-weight: 800;
+}
+
+.autoMethod strong {
+  color: $primary-color;
+}
+
+.helpText {
+  margin: 0;
+  border: 1px solid #e7ded8;
+  border-radius: 6px;
+  background: #fffaf7;
+  padding: 0.8rem;
+  color: $color-muted;
+  font-weight: 700;
+}
+
+.totals {
+  display: grid;
+  gap: 0.8rem;
+  border-color: rgba($primary-color, 0.18);
+  background: #fff8f6;
+}
+
+.totals div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.terms,
+.same {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  font-size: 0.86rem;
+}
+
+.placeOrder {
+  min-height: 2.75rem;
+  border: 0;
+  border-radius: 4px;
+  background: $primary-color;
+  color: #fff;
+  font-weight: 800;
+  text-transform: uppercase;
+  transition:
+    background-color 160ms ease,
+    transform 160ms ease;
+}
+
+.placeOrder:hover:not(:disabled) {
+  background: #b9736c;
+}
+
+.placeOrder:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.placeOrder:disabled {
+  opacity: 0.68;
+  cursor: wait;
+}
+
+.error {
+  margin: 0;
+  color: #b42318;
+  font-weight: 700;
+}
+
+@media (max-width: 680px) {
+  .reviewItem {
+    align-items: stretch;
+  }
+
+  .reviewItem {
+    grid-template-columns: 4rem minmax(0, 1fr);
+  }
+
+  .reviewItem > strong:last-child {
+    grid-column: 1 / -1;
+    justify-self: end;
+  }
+}

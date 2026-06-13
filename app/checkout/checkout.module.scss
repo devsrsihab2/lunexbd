@@ -1,0 +1,34 @@
+.page {
+  min-height: 100vh;
+  background: #f4f5f4;
+}
+
+.header {
+  display: grid;
+  place-items: center;
+  gap: 0.35rem;
+  padding: clamp(1.5rem, 4vw, 2.6rem) 1rem;
+  border-bottom: 1px solid #e8e0da;
+  background: linear-gradient(180deg, #fff, #fcf7f6);
+}
+
+.header h1 {
+  margin: 0;
+  color: #111;
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  line-height: 1.1;
+}
+
+.header p {
+  margin: 0;
+  color: #cc8780;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.inner {
+  width: min(100% - 2rem, 120rem);
+  margin-inline: auto;
+  padding-block: 1.35rem 2.75rem;
+}

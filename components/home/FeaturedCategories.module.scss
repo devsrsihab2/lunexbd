@@ -1,0 +1,274 @@
+@use "@/styles/abstracts/mixins" as *;
+
+$primary: #cc8780;
+$primary-dark: #b8746d;
+$text: #1f2933;
+$card-border: #f1ece7;
+
+.section {
+  @include container;
+
+  padding-top: 1.15rem;
+  padding-bottom: 1.35rem;
+  margin-top: 1.35rem;
+  background: white;
+}
+
+.title {
+  margin: 0 0 1.55rem;
+  color: #111827;
+  font-size: clamp(1.55rem, 2vw, 1.95rem);
+  font-weight: 600;
+  line-height: 1.15;
+  text-align: center;
+}
+
+.sliderWrap {
+  position: relative;
+  padding-inline: 2.35rem;
+}
+
+.rail {
+  --gap: 1.7rem;
+
+  display: flex;
+  gap: var(--gap);
+  align-items: flex-start;
+  overflow-x: auto;
+  padding: 0.15rem 0 0.25rem;
+  cursor: grab;
+  user-select: none;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  touch-action: pan-y;
+}
+
+.rail::-webkit-scrollbar {
+  display: none;
+}
+
+.dragging {
+  cursor: grabbing;
+  scroll-behavior: auto;
+  scroll-snap-type: none;
+}
+
+.centered {
+  justify-content: center;
+}
+
+.card {
+  display: flex;
+  flex: 0 0
+    calc(
+      (100% - (var(--gap) * (var(--visible-items) - 1))) / var(--visible-items)
+    );
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  color: $text;
+  text-align: center;
+  text-decoration: none;
+  scroll-snap-align: start;
+  user-drag: none;
+  -webkit-user-drag: none;
+}
+
+.imageBox {
+  position: relative;
+  width: min(100%, 9.15rem);
+  height: 9.15rem;
+  overflow: hidden;
+  border: 1px solid $card-border;
+  border-radius: 1.05rem;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(16, 24, 40, 0.035);
+  pointer-events: none;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.imageBox img {
+  object-fit: contain;
+  padding: 1rem;
+  user-drag: none;
+  -webkit-user-drag: none;
+  transition: transform 180ms ease;
+  pointer-events: none;
+}
+
+.card strong {
+  display: -webkit-box;
+  max-width: 100%;
+  overflow: hidden;
+  color: $text;
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.25;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  transition: color 180ms ease;
+  pointer-events: none;
+}
+
+.card:hover .imageBox {
+  border-color: rgba(204, 135, 128, 0.42);
+  box-shadow: 0 12px 24px rgba(204, 135, 128, 0.13);
+  transform: translateY(-2px);
+}
+
+.card:hover .imageBox img {
+  transform: scale(1.04);
+}
+
+.card:hover strong {
+  color: $primary;
+}
+
+.navButton {
+  position: absolute;
+  top: 4.65rem;
+  z-index: 5;
+  display: inline-flex;
+  width: 2.15rem;
+  height: 2.15rem;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 999px;
+  background: $primary;
+  color: #ffffff;
+  font-size: 1.75rem;
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 8px 18px rgba(204, 135, 128, 0.25);
+  transition:
+    background 160ms ease,
+    transform 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.navButton:hover {
+  background: $primary-dark;
+  transform: scale(1.04);
+  box-shadow: 0 10px 22px rgba(204, 135, 128, 0.32);
+}
+
+.prevButton {
+  left: 0;
+}
+
+.nextButton {
+  right: 0;
+}
+
+@media (max-width: 1199px) {
+  .sliderWrap {
+    padding-inline: 2.1rem;
+  }
+
+  .rail {
+    --gap: 1.35rem;
+  }
+
+  .imageBox {
+    height: 8.4rem;
+  }
+}
+
+@media (max-width: 991px) {
+  .section {
+    padding-top: 1rem;
+    padding-bottom: 1.15rem;
+  }
+
+  .title {
+    margin-bottom: 1.25rem;
+  }
+
+  .sliderWrap {
+    padding-inline: 1.85rem;
+  }
+
+  .rail {
+    --gap: 1.1rem;
+  }
+
+  .imageBox {
+    height: 7.55rem;
+    border-radius: 0.95rem;
+  }
+
+  .card strong {
+    font-size: 0.92rem;
+  }
+
+  .navButton {
+    top: 3.95rem;
+    width: 2rem;
+    height: 2rem;
+    font-size: 1.55rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .sliderWrap {
+    padding-inline: 0;
+  }
+
+  .rail {
+    --gap: 0.95rem;
+
+    padding-inline: 0.1rem;
+  }
+
+  .imageBox {
+    height: 6.65rem;
+  }
+
+  .card {
+    gap: 0.6rem;
+  }
+
+  .card strong {
+    font-size: 0.88rem;
+  }
+
+  .navButton {
+    display: none;
+  }
+}
+
+@media (max-width: 575px) {
+  .title {
+    margin-bottom: 1.05rem;
+    font-size: 1.35rem;
+  }
+
+  .rail {
+    --gap: 0.8rem;
+  }
+
+  .imageBox {
+    height: 5.85rem;
+    border-radius: 0.8rem;
+  }
+
+  .imageBox img {
+    padding: 0.72rem;
+  }
+
+  .card {
+    gap: 0.5rem;
+  }
+
+  .card strong {
+    font-size: 0.8rem;
+    line-height: 1.2;
+  }
+}

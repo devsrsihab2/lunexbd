@@ -1,0 +1,46 @@
+@use "@/styles/abstracts/variables" as *;
+@use "@/styles/abstracts/mixins" as *;
+
+.field {
+  display: grid;
+  gap: $space-2;
+}
+
+.label {
+  font-weight: 700;
+}
+
+.control {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid $color-line;
+  border-radius: $radius-sm;
+  background: $color-surface;
+  color: $color-ink;
+
+  &:focus {
+    @include focus-ring;
+  }
+}
+
+textarea.control {
+  min-height: 8rem;
+  resize: vertical;
+}
+
+.help {
+  color: $color-muted;
+  font-size: 0.9rem;
+}
+
+.error {
+  color: $color-danger;
+  font-size: 0.9rem;
+}
+
+.choice {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-2;
+}

@@ -1,0 +1,458 @@
+@use "@/styles/abstracts/variables" as *;
+@use "@/styles/abstracts/mixins" as *;
+@use "@/styles/abstracts/breakpoints" as *;
+
+.section {
+  @include container;
+  padding-block: $space-6;
+}
+
+.pickabooTop {
+  background: #f0f0f0;
+}
+
+.topLayout {
+  @include container;
+  display: grid;
+  min-height: 28rem;
+  background: #fff;
+
+  @include lg {
+    grid-template-columns: 19rem 1fr;
+  }
+}
+
+.sideMenu {
+  display: none;
+  padding: $space-3 0;
+  border-right: 1px solid #e4e4e4;
+  background: #fff;
+
+  @include lg {
+    display: block;
+  }
+}
+
+.sideMenuItem {
+  position: relative;
+}
+
+.sideMenuItem > a {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: $space-3;
+  align-items: center;
+  min-height: 2.25rem;
+  padding-inline: $space-4;
+  color: #111;
+  font-size: 0.95rem;
+  text-decoration: none;
+}
+
+.sideMenuItem > a:hover,
+.sideMenuItem:focus-within > a {
+  background: #f3f7fb;
+  color: #1799dc;
+}
+
+.sideMenu b {
+  color: #8a8a8a;
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.megaMenu {
+  position: absolute;
+  top: -$space-3;
+  left: 100%;
+  z-index: 12;
+  display: grid;
+  width: 15rem;
+  min-height: 28rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: $space-3 $space-5;
+  align-content: start;
+  padding: $space-5 $space-4;
+  background: #fff;
+  box-shadow: 18px 0 34px rgba(15, 23, 42, 0.08);
+  opacity: 0;
+  transform: translateY(8px);
+  visibility: hidden;
+  transition:
+    opacity 160ms ease,
+    transform 160ms ease,
+    visibility 160ms ease;
+}
+
+.megaMenu a {
+  color: #111;
+  font-size: 0.83rem;
+  text-decoration: none;
+}
+
+.megaMenu a:hover,
+.megaMenu a:focus-visible {
+  color: #1799dc;
+}
+
+.sideMenuItem:hover .megaMenu,
+.sideMenuItem:focus-within .megaMenu,
+.defaultOpen .megaMenu {
+  opacity: 1;
+  transform: translateY(0);
+  visibility: visible;
+}
+
+.sideMenu:hover .defaultOpen:not(:hover) .megaMenu {
+  opacity: 0;
+  transform: translateY(8px);
+  visibility: hidden;
+}
+
+.banner {
+  position: relative;
+  min-height: 22rem;
+  overflow: hidden;
+  background: #102a4c;
+}
+
+.bannerTrack {
+  display: flex;
+  width: 400%;
+  height: 100%;
+  animation: bannerSlide 20s infinite;
+}
+
+.bannerSlide {
+  display: block;
+  width: 25%;
+  color: inherit;
+}
+
+.bannerSlide > div {
+  height: 100%;
+}
+
+@keyframes bannerSlide {
+  0%,
+  19% {
+    transform: translateX(0);
+  }
+
+  25%,
+  44% {
+    transform: translateX(-25%);
+  }
+
+  50%,
+  69% {
+    transform: translateX(-50%);
+  }
+
+  75%,
+  94% {
+    transform: translateX(-75%);
+  }
+
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.dots {
+  position: absolute;
+  bottom: $space-5;
+  left: 50%;
+  display: flex;
+  gap: $space-2;
+  transform: translateX(-50%);
+}
+
+.dots span {
+  width: 0.55rem;
+  height: 0.55rem;
+  border: 1px solid #fff;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.dots .activeDot {
+  background: #1799dc;
+}
+
+.dealRail {
+  @include container;
+  display: grid;
+  grid-template-columns: 2.5rem 1fr 2.5rem;
+  gap: $space-3;
+  align-items: center;
+  min-height: 7rem;
+  margin-top: $space-4;
+  padding-block: $space-3;
+  background: #fff;
+}
+
+.dealRail button {
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 0;
+  background: transparent;
+  color: #c4c4c4;
+  font-size: 2rem;
+}
+
+.dealRailItems {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: $space-3;
+  overflow: hidden;
+}
+
+.dealItem {
+  display: grid;
+  grid-template-columns: 4.5rem 1fr;
+  gap: $space-3;
+  align-items: center;
+  min-width: 0;
+  padding-inline: $space-3;
+  border-right: 1px solid #e3e3e3;
+  color: #1f2937;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.dealItem > div {
+  border-radius: $radius-sm;
+  background: #e9f7ff;
+}
+
+.dealItem span {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+.hero {
+  display: grid;
+  gap: $space-4;
+  min-height: min(680px, calc(100vh - 5rem));
+  padding-block: $space-4 $space-5;
+
+  @include lg {
+    grid-template-columns: 1.7fr 1fr;
+    align-items: stretch;
+  }
+}
+
+.heroMain {
+  position: relative;
+  display: grid;
+  align-content: end;
+  min-height: 24rem;
+  overflow: hidden;
+  border-radius: $radius-md;
+  background: #173f35;
+  color: #fff;
+}
+
+.heroImage,
+.promoImage {
+  position: absolute;
+  inset: 0;
+}
+
+.heroImage::after,
+.promoImage::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background: linear-gradient(
+    90deg,
+    rgba(6, 32, 25, 0.9),
+    rgba(6, 32, 25, 0.35),
+    rgba(6, 32, 25, 0.1)
+  );
+}
+
+.heroCopy {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: $space-4;
+  max-width: 36rem;
+  padding: clamp(1.25rem, 4vw, 3.5rem);
+}
+
+.eyebrow {
+  color: #f1c86b;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.heroTitle {
+  margin: 0;
+  font-size: clamp(2.25rem, 6vw, 5.5rem);
+  line-height: 0.95;
+}
+
+.heroText {
+  max-width: 30rem;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 1.05rem;
+}
+
+.heroActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-3;
+}
+
+.promoStack {
+  display: grid;
+  gap: $space-4;
+}
+
+.promo {
+  position: relative;
+  min-height: 13rem;
+  overflow: hidden;
+  border-radius: $radius-md;
+  background: $color-brand-dark;
+  color: #fff;
+}
+
+.promoContent {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: $space-2;
+  max-width: 18rem;
+  padding: $space-5;
+}
+
+.categoryRail {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr));
+  gap: $space-3;
+}
+
+.categoryTile {
+  display: grid;
+  gap: $space-2;
+  min-height: 7rem;
+  padding: $space-4;
+  border: 1px solid $color-line;
+  border-radius: $radius-md;
+  background: #fff;
+  color: $color-ink;
+  text-decoration: none;
+}
+
+.categoryTile strong {
+  color: $color-brand-dark;
+}
+
+.categoryTile span {
+  color: $color-muted;
+  font-size: 0.9rem;
+}
+
+.splitBand {
+  display: grid;
+  gap: $space-4;
+
+  @include lg {
+    grid-template-columns: 1.1fr 1fr;
+  }
+}
+
+.dealPanel,
+.servicePanel {
+  display: grid;
+  gap: $space-3;
+  padding: $space-5;
+  border-radius: $radius-md;
+}
+
+.dealPanel {
+  background: #0f6b55;
+  color: #fff;
+}
+
+.servicePanel {
+  border: 1px solid $color-line;
+  background: #fff;
+}
+
+.featureList {
+  display: grid;
+  gap: $space-3;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.featureList li {
+  display: flex;
+  gap: $space-3;
+  align-items: center;
+}
+
+.dot {
+  display: inline-grid;
+  width: 2rem;
+  height: 2rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 999px;
+  background: #f0c55f;
+  color: #173f35;
+  font-weight: 800;
+}
+
+.productSection {
+  display: grid;
+  gap: $space-4;
+}
+
+.brandStrip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: $space-3;
+}
+
+.brand {
+  padding: $space-4;
+  border: 1px solid $color-line;
+  border-radius: $radius-md;
+  background: #fff;
+  color: $color-muted;
+  text-align: center;
+}
+
+@media (max-width: 63.99rem) {
+  .topLayout {
+    min-height: 22rem;
+  }
+
+  .dealRailItems {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 35.99rem) {
+  .dealRail {
+    grid-template-columns: 1fr;
+  }
+
+  .dealRail button {
+    display: none;
+  }
+
+  .dealRailItems {
+    grid-template-columns: 1fr;
+  }
+}

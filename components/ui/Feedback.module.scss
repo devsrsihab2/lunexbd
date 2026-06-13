@@ -1,0 +1,49 @@
+@use "@/styles/abstracts/variables" as *;
+
+.box {
+  display: grid;
+  gap: $space-3;
+  padding: $space-5;
+  border: 1px solid $color-line;
+  border-radius: $radius-md;
+  background: $color-soft;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.text {
+  margin: 0;
+  color: $color-muted;
+}
+
+.skeleton {
+  min-height: 1rem;
+  border-radius: $radius-sm;
+  background: linear-gradient(90deg, #ece8dd, #f8f6f0, #ece8dd);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  to {
+    background-position-x: -200%;
+  }
+}
+
+.loader {
+  width: 2rem;
+  height: 2rem;
+  border: 3px solid $color-line;
+  border-top-color: $color-brand;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

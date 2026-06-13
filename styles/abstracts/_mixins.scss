@@ -1,0 +1,33 @@
+@use "@/styles/abstracts/variables" as *;
+
+@mixin focus-ring {
+  outline: 2px solid $color-accent;
+  outline-offset: 3px;
+}
+
+@mixin container {
+  width: 100%;
+  max-width: 80%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 20px;
+  padding-right: 20px;
+
+  @media (max-width: 1399px) {
+    max-width: 86%;
+  }
+
+  @media (max-width: 1199px) {
+    max-width: 92%;
+  }
+
+  @media (max-width: 991px) {
+    max-width: 96%;
+  }
+
+  @media (max-width: 575px) {
+    max-width: 100%;
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+}

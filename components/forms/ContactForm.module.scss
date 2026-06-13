@@ -1,0 +1,84 @@
+@use "@/styles/abstracts/variables" as *;
+@use "@/styles/abstracts/mixins" as *;
+@use "sass:color";
+
+.formShell {
+  display: grid;
+  gap: $space-5;
+  max-width: 46rem;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border: 1px solid rgba($primary-color, 0.22);
+  border-radius: $radius-md;
+  background: #fff;
+  box-shadow: 0 18px 45px rgba(39, 28, 26, 0.08);
+}
+
+.header {
+  display: grid;
+  gap: $space-2;
+}
+
+.eyebrow {
+  margin: 0;
+  color: $primary-color;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.title {
+  margin: 0;
+  color: $color-ink;
+  font-size: clamp(1.35rem, 2vw, 1.75rem);
+}
+
+.text {
+  margin: 0;
+  color: $color-muted;
+  line-height: 1.7;
+}
+
+.grid {
+  display: grid;
+  gap: $space-4;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.full {
+  grid-column: 1 / -1;
+}
+
+.submit {
+  min-height: 3rem;
+  border-color: $primary-color;
+  background: $primary-color;
+  box-shadow: 0 14px 28px rgba($primary-color, 0.24);
+
+  &:hover:not(:disabled) {
+    background: color.adjust($primary-color, $lightness: -7%);
+    transform: translateY(-1px);
+  }
+}
+
+.notice {
+  padding: 0.85rem 1rem;
+  border: 1px solid rgba($color-success, 0.25);
+  border-radius: $radius-sm;
+  background: rgba($color-success, 0.08);
+  color: $color-success;
+  font-weight: 700;
+}
+
+.error {
+  padding: 0.85rem 1rem;
+  border: 1px solid rgba($color-danger, 0.25);
+  border-radius: $radius-sm;
+  background: rgba($color-danger, 0.08);
+  color: $color-danger;
+  font-weight: 700;
+}

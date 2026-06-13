@@ -1,0 +1,104 @@
+@use "@/styles/abstracts/variables" as *;
+
+.form {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.form input,
+.form select {
+  border-color: rgba(204, 135, 128, 0.28);
+  background: #fffafa;
+}
+
+.form input:focus,
+.form select:focus {
+  outline: 2px solid rgba(204, 135, 128, 0.34);
+  outline-offset: 2px;
+  border-color: #cc8780;
+}
+
+.group {
+  display: grid;
+  gap: 0.75rem;
+  border-bottom: 1px solid rgba(204, 135, 128, 0.2);
+  padding: 0 0 1rem;
+}
+
+.group:last-of-type {
+  border-bottom: 0;
+}
+
+.groupHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.groupHead h2 {
+  position: relative;
+  margin: 0;
+  padding-bottom: 0.52rem;
+  color: #171717;
+  font-size: 0.86rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.groupHead h2::after {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 4.9rem;
+  height: 2px;
+  background: #cc8780;
+  content: "";
+}
+
+.groupHead span {
+  width: 0.65rem;
+  height: 1px;
+  background: #cc8780;
+}
+
+.range {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.actions {
+  display: grid;
+  gap: 0.65rem;
+  padding-top: 0.35rem;
+}
+
+.actions button,
+.actions a {
+  display: grid;
+  width: 100%;
+  min-height: 2.55rem;
+  place-items: center;
+  border: 1px solid #cc8780;
+  border-radius: 4px;
+  background: #fff;
+  color: #9d625d;
+  font-size: 0.86rem;
+  font-weight: 800;
+  text-decoration: none;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background 160ms ease,
+    color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.actions button:hover,
+.actions a:hover {
+  background: #cc8780;
+  color: #fff;
+  box-shadow: 0 12px 24px rgba(204, 135, 128, 0.18);
+}

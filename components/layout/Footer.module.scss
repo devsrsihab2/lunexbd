@@ -1,0 +1,148 @@
+@use "@/styles/abstracts/variables" as *;
+@use "@/styles/abstracts/mixins" as *;
+@use "@/styles/abstracts/breakpoints" as *;
+
+$brand: #cc8780;
+$brand-deep: #9d625d;
+$ink: #1c1716;
+$muted: #756a67;
+$line: rgba(204, 135, 128, 0.22);
+
+.footer {
+  margin-block-start: $space-7;
+  border-top: 1px solid $line;
+  background:
+    linear-gradient(135deg, rgba(204, 135, 128, 0.14), rgba(255, 255, 255, 0.92) 45%, rgba(204, 135, 128, 0.08)),
+    #fffaf8;
+  color: $ink;
+}
+
+.inner {
+  @include container;
+  display: grid;
+  gap: clamp(1.4rem, 3vw, 3rem);
+  padding-block: clamp(2rem, 5vw, 4rem);
+
+  @include md {
+    grid-template-columns: minmax(0, 1.35fr) minmax(12rem, 0.8fr) minmax(14rem, 0.9fr);
+    align-items: start;
+  }
+}
+
+.brandBlock {
+  display: grid;
+  gap: 1rem;
+  max-width: 34rem;
+}
+
+.brand {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  gap: 0.75rem;
+  color: $ink;
+  text-decoration: none;
+}
+
+.brand span {
+  display: grid;
+  width: 3.2rem;
+  height: 3.2rem;
+  place-items: center;
+  border: 1px solid $line;
+  border-radius: 999px;
+  background: #fff;
+  color: $brand-deep;
+  font-size: 2rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.brand strong {
+  color: $ink;
+  font-size: clamp(1.55rem, 3vw, 2.25rem);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.logoImage {
+  display: block;
+  width: auto;
+  max-width: min(14rem, 74vw);
+  height: auto;
+  max-height: 5rem;
+  object-fit: contain;
+}
+
+.footerGroup {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.footerGroup h3 {
+  position: relative;
+  margin: 0;
+  padding-bottom: 0.55rem;
+  color: $ink;
+  font-size: 1rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.footerGroup h3::after {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 3.5rem;
+  height: 2px;
+  background: $brand;
+  content: "";
+}
+
+.links {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.links a {
+  width: fit-content;
+  color: $muted;
+  font-weight: 800;
+  text-decoration: none;
+  transition:
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.links a:hover {
+  transform: translateX(2px);
+  color: $brand-deep;
+}
+
+.muted {
+  margin: 0;
+  color: $muted;
+  line-height: 1.75;
+}
+
+.bottom {
+  @include container;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  border-top: 1px solid $line;
+  padding-block: 1rem;
+  color: $muted;
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.bottom span:first-child {
+  color: $brand-deep;
+}
+
+@media (max-width: 700px) {
+  .bottom {
+    flex-direction: column;
+  }
+}

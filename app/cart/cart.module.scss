@@ -1,0 +1,10 @@
+.page {
+  min-height: 70vh;
+  background: #f7f7f5;
+}
+
+.inner {
+  width: min(100% - 2rem, 96rem);
+  margin-inline: auto;
+  padding-block: 1.5rem 3rem;
+}

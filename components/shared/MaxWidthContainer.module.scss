@@ -1,0 +1,50 @@
+.container,
+.containerFluid {
+  width: 100%;
+  padding-left: 20px;
+  padding-right: 20px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.container {
+  max-width: 80%;
+}
+
+.containerFluid {
+  max-width: 100%;
+}
+
+/* Large desktop */
+@media (max-width: 1399px) {
+  .container {
+    max-width: 86%;
+  }
+}
+
+/* Laptop */
+@media (max-width: 1199px) {
+  .container {
+    max-width: 92%;
+  }
+}
+
+/* Tablet */
+@media (max-width: 991px) {
+  .container {
+    max-width: 96%;
+  }
+}
+
+/* Mobile */
+@media (max-width: 575px) {
+  .container,
+  .containerFluid {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .container {
+    max-width: 100%;
+  }
+}
