@@ -2,17 +2,18 @@
 
 .checkout {
   display: grid;
-  gap: 1.05rem;
+  gap: 1.15rem;
+  color: $color-ink;
 }
 
 .grid {
   display: grid;
-  gap: 1rem;
+  gap: clamp(1rem, 2vw, 1.4rem);
 }
 
 @media (min-width: 980px) {
   .grid {
-    grid-template-columns: minmax(0, 1.42fr) minmax(22rem, 1fr);
+    grid-template-columns: minmax(0, 1.34fr) minmax(20rem, 0.82fr);
     align-items: start;
   }
 }
@@ -23,36 +24,74 @@
   gap: 1rem;
 }
 
+.right {
+  align-content: start;
+}
+
+@media (min-width: 980px) {
+  .right {
+    position: sticky;
+    top: 6.25rem;
+  }
+}
+
 .panel,
 .totals {
-  padding: 1rem;
-  border: 1px solid #e7ded8;
+  padding: clamp(0.95rem, 1.6vw, 1.2rem);
+  border: 1px solid rgba($primary-color, 0.16);
   border-radius: 8px;
   background: #fff;
-  box-shadow: 0 12px 30px rgba(17, 24, 39, 0.04);
+  box-shadow: 0 16px 38px rgba(39, 24, 20, 0.045);
 }
 
 .panel h2 {
-  margin: 0 0 0.9rem;
-  border-left: 3px solid #cc8780;
-  padding-left: 0.45rem;
-  font-size: 1rem;
+  margin: 0 0 0.95rem;
+  border-left: 3px solid $primary-color;
+  padding-left: 0.55rem;
+  color: #1f1b1a;
+  font-size: 0.98rem;
+  line-height: 1.25;
 }
 
 .reviewItem {
   display: grid;
-  grid-template-columns: 4.2rem 1fr auto;
-  gap: 0.9rem;
+  grid-template-columns: 5rem minmax(0, 1fr) auto;
+  gap: 1rem;
   align-items: center;
+  border: 1px solid #efe5df;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #fffdfc 0%, #fff8f6 100%);
+  padding: 0.75rem;
+}
+
+.reviewItem > div:nth-child(2) {
+  min-width: 0;
+}
+
+.reviewItem > div:nth-child(2) > strong {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #1e1b1a;
+  font-size: 0.95rem;
+  font-weight: 760;
+  line-height: 1.36;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.reviewItem > strong:last-child {
+  color: $primary-color;
+  font-size: 1.05rem;
+  white-space: nowrap;
 }
 
 .thumb {
   position: relative;
   aspect-ratio: 1;
   overflow: hidden;
-  border: 1px solid #e7ded8;
+  border: 1px solid #f0e5de;
   border-radius: 6px;
-  background: #fffaf7;
+  background: #fff;
 }
 
 .thumb img {
@@ -75,19 +114,68 @@
 
 .qtyRow {
   display: inline-flex;
-  gap: 0.4rem;
   align-items: center;
-  margin-top: 0.35rem;
+  margin-top: 0.55rem;
+  overflow: hidden;
+  border: 1px solid rgba($primary-color, 0.26);
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 8px 18px rgba($primary-color, 0.08);
+}
+
+.qtyRow span {
+  padding: 0 0.7rem;
+  color: $color-muted;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
 }
 
 .qtyRow button {
-  width: 1.55rem;
-  height: 1.55rem;
+  display: grid;
+  width: 2.1rem;
+  min-width: 2.1rem;
+  height: 2.1rem;
+  place-items: center;
   border: 0;
-  border-radius: 50%;
-  background: rgba($primary-color, 0.13);
-  color: $primary-color;
+  border-left: 1px solid rgba($primary-color, 0.16);
+  background: #fff8f6;
+  color: #9c5e58;
+  cursor: pointer;
+  font-size: 1rem;
   font-weight: 900;
+  line-height: 1;
+  transition:
+    background-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.qtyRow button:hover:not(:disabled) {
+  background: $primary-color;
+  color: #fff;
+}
+
+.qtyRow button:active:not(:disabled) {
+  transform: scale(0.94);
+}
+
+.qtyRow button:disabled {
+  color: #c9aaa5;
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.qtyRow b {
+  display: grid;
+  min-width: 2.25rem;
+  height: 2.1rem;
+  place-items: center;
+  border-left: 1px solid rgba($primary-color, 0.16);
+  background: #fff;
+  color: #1f1b1a;
+  font-size: 0.95rem;
+  font-weight: 850;
 }
 
 .fields {
@@ -108,15 +196,154 @@
 
 .fields input,
 .fields select,
+.searchButton,
 .fullControl,
 .panel textarea {
   width: 100%;
-  min-height: 2.55rem;
-  border: 1px solid #d8d1ca;
-  border-radius: 5px;
+  min-height: 2.7rem;
+  border: 1px solid #ded3cc;
+  border-radius: 6px;
   background: #fff;
-  padding: 0.7rem;
+  padding: 0.72rem 0.78rem;
+  color: $color-ink;
   font: inherit;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    background-color 160ms ease;
+}
+
+.fields input:focus,
+.fields select:focus,
+.searchButton:focus,
+.fullControl:focus,
+.panel textarea:focus {
+  border-color: rgba($primary-color, 0.75);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba($primary-color, 0.14);
+}
+
+.fields select:disabled {
+  background: #f7f2ef;
+  color: #9a8d86;
+  cursor: not-allowed;
+}
+
+.searchSelect {
+  position: relative;
+  min-width: 0;
+}
+
+.searchButton {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.searchButton span:first-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.searchButton span:last-child {
+  color: #9b756d;
+  font-size: 0.86rem;
+}
+
+.searchMenu {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 0.35rem);
+  right: 0;
+  left: 0;
+  overflow: hidden;
+  border: 1px solid #d8c9c0;
+  border-radius: 7px;
+  background: #fff;
+  box-shadow: 0 18px 42px rgba(25, 18, 16, 0.16);
+}
+
+.searchInputWrap {
+  position: relative;
+  display: block;
+  padding: 0.45rem;
+  border-bottom: 1px solid #eaded7;
+  background: #fff;
+}
+
+.searchInputWrap::after {
+  position: absolute;
+  top: 50%;
+  right: 0.95rem;
+  width: 0.72rem;
+  height: 0.72rem;
+  border: 2px solid #5f5b57;
+  border-radius: 50%;
+  content: "";
+  transform: translateY(-58%);
+}
+
+.searchInputWrap::before {
+  position: absolute;
+  top: 1.62rem;
+  right: 0.78rem;
+  width: 0.42rem;
+  height: 2px;
+  border-radius: 2px;
+  background: #5f5b57;
+  content: "";
+  transform: rotate(45deg);
+}
+
+.searchInputWrap input {
+  min-height: 2.35rem;
+  padding-right: 2.25rem;
+}
+
+.searchOptions {
+  display: grid;
+  max-height: 13rem;
+  overflow-y: auto;
+  padding-block: 0.25rem;
+}
+
+.searchOptions button {
+  width: 100%;
+  min-height: 2.25rem;
+  border: 0;
+  background: #fff;
+  color: $color-muted;
+  cursor: pointer;
+  padding: 0.5rem 0.8rem;
+  text-align: left;
+  font: inherit;
+  transition:
+    background-color 140ms ease,
+    color 140ms ease;
+}
+
+.searchOptions button:hover,
+.searchOptions button:focus,
+.activeOption {
+  background: $primary-color;
+  color: #fff;
+  outline: none;
+}
+
+.searchOptions p {
+  margin: 0;
+  padding: 0.8rem;
+  color: $color-muted;
+  font-weight: 700;
+}
+
+.panel textarea {
+  min-height: 5rem;
+  resize: vertical;
 }
 
 .methodGrid {
@@ -135,15 +362,21 @@
   min-height: 2.55rem;
   align-items: center;
   gap: 0.55rem;
-  border: 1px solid #d8d1ca;
-  border-radius: 5px;
+  border: 1px solid #ded3cc;
+  border-radius: 7px;
   padding: 0.55rem 0.7rem;
   cursor: pointer;
+  font-weight: 750;
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease,
+    box-shadow 160ms ease;
 }
 
 .activeMethod {
   border-color: $primary-color;
   background: rgba($primary-color, 0.11);
+  box-shadow: inset 0 0 0 1px rgba($primary-color, 0.08);
 }
 
 .emptyMethod {
@@ -189,15 +422,32 @@
 
 .totals {
   display: grid;
-  gap: 0.8rem;
-  border-color: rgba($primary-color, 0.18);
-  background: #fff8f6;
+  gap: 0;
+  border-color: rgba($primary-color, 0.24);
+  background: linear-gradient(180deg, #fff8f6 0%, #fff 100%);
 }
 
 .totals div {
   display: flex;
   justify-content: space-between;
   gap: 1rem;
+  padding: 0.55rem 0;
+  color: $color-muted;
+  font-weight: 700;
+}
+
+.totals div + div {
+  border-top: 1px solid rgba($primary-color, 0.15);
+}
+
+.totals div:last-child {
+  padding-top: 0.75rem;
+  color: $color-ink;
+  font-size: 1.08rem;
+}
+
+.totals strong {
+  color: $primary-color;
 }
 
 .terms,
@@ -209,20 +459,24 @@
 }
 
 .placeOrder {
-  min-height: 2.75rem;
+  min-height: 3rem;
   border: 0;
-  border-radius: 4px;
+  border-radius: 6px;
   background: $primary-color;
   color: #fff;
   font-weight: 800;
+  letter-spacing: 0;
   text-transform: uppercase;
+  box-shadow: 0 14px 26px rgba($primary-color, 0.22);
   transition:
     background-color 160ms ease,
+    box-shadow 160ms ease,
     transform 160ms ease;
 }
 
 .placeOrder:hover:not(:disabled) {
   background: #b9736c;
+  box-shadow: 0 16px 30px rgba($primary-color, 0.28);
 }
 
 .placeOrder:active:not(:disabled) {
@@ -242,11 +496,8 @@
 
 @media (max-width: 680px) {
   .reviewItem {
-    align-items: stretch;
-  }
-
-  .reviewItem {
-    grid-template-columns: 4rem minmax(0, 1fr);
+    grid-template-columns: 4.5rem minmax(0, 1fr);
+    align-items: start;
   }
 
   .reviewItem > strong:last-child {

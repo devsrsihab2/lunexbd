@@ -190,7 +190,7 @@ export default async function ProductDetailPage({
               {product.sku ? <span>SKU: {product.sku}</span> : null}
             </div>
 
-            <h1>{product.name}</h1>
+            <h1 className={styles.productTitle}>{product.name}</h1>
 
             <div className={styles.priceRow}>
               <span className={styles.price}>

@@ -1,21 +1,11 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { bangladeshDistricts, getDivisionByDistrict, getThanasByDistrict } from "@/data/bangladesh-locations";
 import { placeOrder } from "@/services/api/checkout.api";
 import type { CheckoutLineItem, CheckoutOptions } from "@/types/checkout.types";
 import { formatPrice } from "@/utils/formatPrice";
 import styles from "./CheckoutForm.module.scss";
-
-const divisions = [
-  "Dhaka",
-  "Chattogram",
-  "Rajshahi",
-  "Khulna",
-  "Barishal",
-  "Sylhet",
-  "Rangpur",
-  "Mymensingh",
-];
 
 const divisionAliases: Record<string, string[]> = {
   Chattogram: ["Chattogram", "Chittagong"],
@@ -55,12 +45,24 @@ export function CheckoutForm({ options, item }: { options?: CheckoutOptions | nu
   const paymentMethods = useMemo(() => (options?.paymentMethods || []).filter((method) => method.enabled), [options?.paymentMethods]);
   const shippingMethods = useMemo(() => options?.shippingMethods || [], [options?.shippingMethods]);
   const [paymentMethodChoice, setPaymentMethodChoice] = useState("");
-  const [selectedDivision, setSelectedDivision] = useState("");
+  const [selectedDistrict, setSelectedDistrict] = useState("");
+  const [selectedThana, setSelectedThana] = useState("");
+  const [districtSearch, setDistrictSearch] = useState("");
+  const [isDistrictOpen, setIsDistrictOpen] = useState(false);
   const hasPaymentMethods = paymentMethods.length > 0;
   const hasShippingMethods = shippingMethods.length > 0;
   const paymentMethod = paymentMethods.some((method) => method.id === paymentMethodChoice)
     ? paymentMethodChoice
     : paymentMethods[0]?.id || "";
+  const selectedDivision = getDivisionByDistrict(selectedDistrict);
+  const thanaOptions = useMemo(() => getThanasByDistrict(selectedDistrict), [selectedDistrict]);
+  const filteredDistricts = useMemo(() => {
+    const query = districtSearch.trim().toLowerCase();
+
+    if (!query) return bangladeshDistricts;
+
+    return bangladeshDistricts.filter((district) => district.name.toLowerCase().includes(query));
+  }, [districtSearch]);
   const selectedShipping = useMemo(() => {
     if (!selectedDivision) return null;
 
@@ -94,6 +96,10 @@ export function CheckoutForm({ options, item }: { options?: CheckoutOptions | nu
       setMessage("No delivery method available.");
       return;
     }
+    if (!selectedDistrict) {
+      setMessage("Please select your district.");
+      return;
+    }
     if (!shippingMethod) {
       setMessage("No delivery method available.");
       return;
@@ -118,9 +124,9 @@ export function CheckoutForm({ options, item }: { options?: CheckoutOptions | nu
         email: formData.get("email"),
         phone: formData.get("phone"),
         address1: formData.get("address1"),
-        city: formData.get("district"),
+        city: selectedDistrict,
         state: selectedDivision,
-        postcode: formData.get("area"),
+        postcode: selectedThana,
         country: "BD",
       },
       shipping: {
@@ -128,9 +134,9 @@ export function CheckoutForm({ options, item }: { options?: CheckoutOptions | nu
         lastName,
         phone: formData.get("phone"),
         address1: formData.get("address1"),
-        city: formData.get("district"),
+        city: selectedDistrict,
         state: selectedDivision,
-        postcode: formData.get("area"),
+        postcode: selectedThana,
         country: "BD",
       },
     });
@@ -164,9 +170,18 @@ export function CheckoutForm({ options, item }: { options?: CheckoutOptions | nu
                 <strong>{summaryItem.name}</strong>
                 <div className={styles.qtyRow}>
                   <span>Qty.</span>
-                  <button type="button" onClick={() => setQuantity(Math.max(1, quantity - 1))}>-</button>
-                  <b>{quantity}</b>
-                  <button type="button" onClick={() => setQuantity(quantity + 1)}>+</button>
+                  <button
+                    type="button"
+                    aria-label="Decrease quantity"
+                    disabled={quantity <= 1}
+                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                  >
+                    -
+                  </button>
+                  <b aria-live="polite">{quantity}</b>
+                  <button type="button" aria-label="Increase quantity" onClick={() => setQuantity(quantity + 1)}>
+                    +
+                  </button>
                 </div>
               </div>
               <strong>{formatPrice(subtotal)}</strong>
@@ -180,14 +195,67 @@ export function CheckoutForm({ options, item }: { options?: CheckoutOptions | nu
               <input name="phone" placeholder="017********" required />
               <input name="email" type="email" placeholder="Email address" />
               <input name="address1" placeholder="ex: House no. / building / street / area" required />
-              <select name="division" required value={selectedDivision} onChange={(event) => setSelectedDivision(event.target.value)}>
-                <option value="" disabled>Division</option>
-                {divisions.map((division) => (
-                  <option key={division} value={division}>{division}</option>
+              <div
+                className={styles.searchSelect}
+                onBlur={(event) => {
+                  const nextTarget = event.relatedTarget;
+
+                  if (!(nextTarget instanceof Node) || !event.currentTarget.contains(nextTarget)) {
+                    setIsDistrictOpen(false);
+                    setDistrictSearch("");
+                  }
+                }}
+              >
+                <input type="hidden" name="district" value={selectedDistrict} />
+                <button
+                  type="button"
+                  className={styles.searchButton}
+                  aria-haspopup="listbox"
+                  aria-expanded={isDistrictOpen}
+                  onClick={() => setIsDistrictOpen((open) => !open)}
+                >
+                  <span>{selectedDistrict || "Select District"}</span>
+                  <span aria-hidden="true">v</span>
+                </button>
+                {isDistrictOpen ? (
+                  <div className={styles.searchMenu}>
+                    <label className={styles.searchInputWrap}>
+                      <span className="sr-only">Search district</span>
+                      <input
+                        autoFocus
+                        type="search"
+                        value={districtSearch}
+                        onChange={(event) => setDistrictSearch(event.target.value)}
+                      />
+                    </label>
+                    <div className={styles.searchOptions} role="listbox">
+                      {filteredDistricts.length ? filteredDistricts.map((district) => (
+                        <button
+                          key={district.name}
+                          type="button"
+                          className={district.name === selectedDistrict ? styles.activeOption : undefined}
+                          role="option"
+                          aria-selected={district.name === selectedDistrict}
+                          onClick={() => {
+                            setSelectedDistrict(district.name);
+                            setSelectedThana("");
+                            setDistrictSearch("");
+                            setIsDistrictOpen(false);
+                          }}
+                        >
+                          {district.name}
+                        </button>
+                      )) : <p>No district found</p>}
+                    </div>
+                  </div>
+                ) : null}
+              </div>
+              <select name="area" value={selectedThana} onChange={(event) => setSelectedThana(event.target.value)} disabled={!selectedDistrict}>
+                <option value="">{selectedDistrict ? "Select Thana (Optional)" : "Select district first"}</option>
+                {thanaOptions.map((thana) => (
+                  <option key={thana} value={thana}>{thana}</option>
                 ))}
               </select>
-              <input name="district" placeholder="District" required />
-              <input name="area" placeholder="Area / Postcode" />
             </div>
           </section>
 
@@ -224,7 +292,7 @@ export function CheckoutForm({ options, item }: { options?: CheckoutOptions | nu
                 <strong>{formatPrice(selectedShipping.cost)}</strong>
               </div>
             ) : (
-              <p className={styles.helpText}>Select a division to see the delivery method.</p>
+              <p className={styles.helpText}>Select a district to see the delivery method.</p>
             )}
           </section>
 

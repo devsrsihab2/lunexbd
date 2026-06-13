@@ -8,7 +8,11 @@ import { getMenus, getSettings } from "@/services/api/content.api";
 import { createMetadata } from "@/utils/seo";
 import "./globals.scss";
 
-export const metadata: Metadata = createMetadata({});
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSettings();
+
+  return createMetadata({ favicon: settings.success ? settings.data.favicon : undefined });
+}
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const [menus, settings] = await Promise.all([getMenus(), getSettings()]);

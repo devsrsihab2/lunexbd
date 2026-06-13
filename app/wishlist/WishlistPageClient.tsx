@@ -95,7 +95,7 @@ export function WishlistPageClient() {
                 <Link className={styles.image} href={`/product/${product.slug}`}>
                   {image?.src ? (
                     <img
-                      src={image.thumbnail || image.src}
+                      src={image.src}
                       alt={image.alt || product.name}
                       loading="lazy"
                       decoding="async"

@@ -75,6 +75,7 @@ export type SiteSettings = {
   siteName: string;
   logo?: string;
   footerLogo?: string;
+  favicon?: string;
   contactEmail?: string;
   contactPhone?: string;
   address?: string;

@@ -6,12 +6,14 @@ export function createMetadata(input: {
   description?: string;
   path?: string;
   image?: string;
+  favicon?: string;
   robots?: string;
 }): Metadata {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://lunexbd.com";
   const title = input.title ? `${input.title} | ${SITE_NAME}` : SITE_NAME;
   const description = input.description || DEFAULT_DESCRIPTION;
   const canonical = new URL(input.path || "/", siteUrl).toString();
+  const favicon = input.favicon || "/favicon.ico";
 
   return {
     title,
@@ -28,6 +30,11 @@ export function createMetadata(input: {
       title,
       description,
       images: input.image ? [input.image] : undefined,
+    },
+    icons: {
+      icon: [{ url: favicon }],
+      shortcut: [{ url: favicon }],
+      apple: [{ url: favicon }],
     },
     robots: input.robots,
   };
