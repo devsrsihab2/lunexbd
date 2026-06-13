@@ -46,8 +46,6 @@ type WooStoreCategory = {
   slug: string;
 };
 
-let categoryIdBySlugCache: Record<string, string> | null = null;
-
 function decodeHtml(value?: string) {
   if (!value) return "";
 
@@ -107,6 +105,11 @@ function buildUrl(path: string, query?: Record<string, QueryValue>) {
   return url.toString();
 }
 
+function addCacheBuster(url: string) {
+  const separator = url.includes("?") ? "&" : "?";
+  return `${url}${separator}_lunex_no_cache=${Date.now()}`;
+}
+
 async function fetchWooStore<T>(
   path: string,
   query?: Record<string, QueryValue>,
@@ -115,11 +118,14 @@ async function fetchWooStore<T>(
   try {
     const { noStore: _noStore, ...fetchOptions } = options || {};
 
-    const response = await fetch(buildUrl(path, query), {
+    const response = await fetch(addCacheBuster(buildUrl(path, query)), {
       method: "GET",
       cache: "no-store",
       headers: {
         Accept: "application/json",
+        "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+        Pragma: "no-cache",
+        Expires: "0",
         ...(fetchOptions.headers || {}),
       },
       ...fetchOptions,
@@ -226,18 +232,16 @@ async function getCategoryIdBySlug(slug: string) {
 
   if (!cleanSlug || /^\d+$/.test(cleanSlug)) return cleanSlug;
 
-  if (!categoryIdBySlugCache) {
-    const response = await fetchWooStore<WooStoreCategory[]>("/wc/store/v1/products/categories");
-    categoryIdBySlugCache = {};
+  const response = await fetchWooStore<WooStoreCategory[]>("/wc/store/v1/products/categories");
+  const categoryIdBySlug: Record<string, string> = {};
 
-    if (response.success && Array.isArray(response.data)) {
-      response.data.forEach((category) => {
-        categoryIdBySlugCache![category.slug] = String(category.id);
-      });
-    }
+  if (response.success && Array.isArray(response.data)) {
+    response.data.forEach((category) => {
+      categoryIdBySlug[category.slug] = String(category.id);
+    });
   }
 
-  return categoryIdBySlugCache[cleanSlug] || cleanSlug;
+  return categoryIdBySlug[cleanSlug] || cleanSlug;
 }
 
 async function mapWooQuery(query: ProductQuery = {}): Promise<ProductQuery> {

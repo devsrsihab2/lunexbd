@@ -26,6 +26,9 @@ function copyRequestHeaders(request: NextRequest, body?: string) {
   const headers = new Headers();
 
   headers.set("Accept", "application/json");
+  headers.set("Cache-Control", "no-cache, no-store, max-age=0, must-revalidate");
+  headers.set("Pragma", "no-cache");
+  headers.set("Expires", "0");
 
   const contentType = request.headers.get("content-type");
   if (contentType && body !== undefined) {
@@ -63,6 +66,9 @@ function copyResponseHeaders(response: Response) {
     "Content-Type",
     response.headers.get("content-type") || "application/json",
   );
+  headers.set("Cache-Control", "no-store, no-cache, max-age=0, must-revalidate");
+  headers.set("Pragma", "no-cache");
+  headers.set("Expires", "0");
 
   const passthroughHeaders = [
     "x-wp-total",
@@ -110,6 +116,10 @@ async function proxy(request: NextRequest, context: RouteContext) {
   request.nextUrl.searchParams.forEach((value, key) => {
     target.searchParams.set(key, value);
   });
+
+  if (["GET", "HEAD"].includes(request.method)) {
+    target.searchParams.set("_lunex_no_cache", String(Date.now()));
+  }
 
   const body = await getRequestBody(request);
 

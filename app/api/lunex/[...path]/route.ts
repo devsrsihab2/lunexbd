@@ -18,8 +18,12 @@ async function proxy(request: NextRequest, context: { params: Promise<{ path: st
   const { path } = await context.params;
   const target = new URL(`/wp-json/lunex/v1/${path.join("/")}`, baseUrl);
   request.nextUrl.searchParams.forEach((value, key) => target.searchParams.set(key, value));
+  if (["GET", "HEAD"].includes(request.method)) target.searchParams.set("_lunex_no_cache", String(Date.now()));
   const headers = new Headers({
     Accept: "application/json",
+    "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+    Pragma: "no-cache",
+    Expires: "0",
   });
   const authorization = request.headers.get("authorization");
   const cookie = request.headers.get("cookie");
@@ -39,6 +43,9 @@ async function proxy(request: NextRequest, context: { params: Promise<{ path: st
   const body = await response.text();
   const responseHeaders = new Headers({
     "Content-Type": response.headers.get("content-type") || "application/json",
+    "Cache-Control": "no-store, no-cache, max-age=0, must-revalidate",
+    Pragma: "no-cache",
+    Expires: "0",
   });
   const setCookie = response.headers.get("set-cookie");
   const location = response.headers.get("location");

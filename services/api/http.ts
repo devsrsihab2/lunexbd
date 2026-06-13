@@ -62,6 +62,17 @@ function buildUrl(path: string, query?: FetchOptions["query"]) {
   return url.toString();
 }
 
+function addCacheBuster(url: string) {
+  const separator = url.includes("?") ? "&" : "?";
+  return `${url}${separator}_lunex_no_cache=${Date.now()}`;
+}
+
+function shouldBypassHttpCache(path: string, method: string) {
+  return ["GET", "HEAD"].includes(method) && (
+    path.startsWith("/wc/store/v1/") || path.startsWith("/lunex/v1/")
+  );
+}
+
 function isStoreApiPath(path: string) {
   return path.startsWith("/wc/store/v1/");
 }
@@ -184,6 +195,10 @@ function createHeaders(
     });
   }
 
+  headers.set("Cache-Control", "no-cache, no-store, max-age=0, must-revalidate");
+  headers.set("Pragma", "no-cache");
+  headers.set("Expires", "0");
+
   return headers;
 }
 
@@ -201,9 +216,14 @@ async function executeRequest<T>(
     ...restOptions
   } = options;
 
-  const response = await fetch(buildUrl(path, query), {
+  const requestUrl = shouldBypassHttpCache(path, requestMethod)
+    ? addCacheBuster(buildUrl(path, query))
+    : buildUrl(path, query);
+
+  const response = await fetch(requestUrl, {
     ...restOptions,
     method: requestMethod,
+    cache: shouldBypassHttpCache(path, requestMethod) ? "no-store" : restOptions.cache,
     credentials,
     headers: createHeaders(path, body, auth, headers),
     body: createBody(body),
