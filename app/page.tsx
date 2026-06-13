@@ -13,6 +13,8 @@ import type { HomeBanner, MenuItem } from "@/types/content.types";
 import { organizationSchema, websiteSchema } from "@/utils/schema";
 import styles from "./page.module.scss";
 
+export const dynamic = "force-dynamic";
+
 const fallbackBanners: HomeBanner[] = [
   {
     title: "Made for every moment",

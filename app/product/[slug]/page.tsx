@@ -20,7 +20,7 @@ import { ProductWishlistAction } from "./ProductWishlistAction";
 import { ReviewForm } from "./ReviewForm";
 import styles from "./product-detail.module.scss";
 
-export const revalidate = 300;
+export const dynamic = "force-dynamic";
 export const dynamicParams = true;
 
 export async function generateStaticParams() {

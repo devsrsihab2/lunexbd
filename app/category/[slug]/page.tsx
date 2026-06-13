@@ -11,6 +11,8 @@ type CategoryPageProps = {
   searchParams: Promise<Record<string, string | undefined>>;
 };
 
+export const dynamic = "force-dynamic";
+
 export async function generateMetadata({ params }: Pick<CategoryPageProps, "params">): Promise<Metadata> {
   const { slug } = await params;
   const category = await getCategoryBySlug(slug);

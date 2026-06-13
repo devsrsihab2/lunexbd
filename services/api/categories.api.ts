@@ -43,8 +43,8 @@ function mergeCategories(primary: Category[], fallback: Category[]) {
 
 export async function getCategories() {
   const [storeResponse, featuredResponse] = await Promise.all([
-    apiFetch<WooStoreCategory[]>("/wc/store/v1/products/categories"),
-    apiFetch<WooStoreCategory[]>("/lunex/v1/featured-categories"),
+    apiFetch<WooStoreCategory[]>("/wc/store/v1/products/categories", { cache: "no-store" }),
+    apiFetch<WooStoreCategory[]>("/lunex/v1/featured-categories", { cache: "no-store" }),
   ]);
 
   const storeCategories = storeResponse.success ? storeResponse.data.map(mapWooCategory) : [];

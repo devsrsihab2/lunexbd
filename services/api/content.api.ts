@@ -2,15 +2,15 @@ import { storefrontProxy } from "./http";
 import type { BlogPost, BlogPostsQuery, CmsPage, HomeContent, MenuItem, SiteSettings } from "@/types/content.types";
 
 export function getHome() {
-  return storefrontProxy<HomeContent>("/home");
+  return storefrontProxy<HomeContent>("/home", { cache: "no-store" });
 }
 
 export function getSettings() {
-  return storefrontProxy<SiteSettings>("/settings");
+  return storefrontProxy<SiteSettings>("/settings", { cache: "no-store" });
 }
 
 export function getMenus() {
-  return storefrontProxy<{ top?: MenuItem[]; header: MenuItem[]; mega?: MenuItem[]; footer: MenuItem[] }>("/menus");
+  return storefrontProxy<{ top?: MenuItem[]; header: MenuItem[]; mega?: MenuItem[]; footer: MenuItem[] }>("/menus", { cache: "no-store" });
 }
 
 export function getCmsPage(slug: string) {

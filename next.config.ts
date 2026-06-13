@@ -4,12 +4,6 @@ const imageDomain = process.env.NEXT_PUBLIC_IMAGE_DOMAIN;
 const imageProtocol: "http" | "https" = process.env.NEXT_PUBLIC_IMAGE_PROTOCOL === "http" ? "http" : "https";
 
 const nextConfig: NextConfig = {
-  experimental: {
-    staleTimes: {
-      dynamic: 15,
-      static: 30,
-    },
-  },
   images: {
     remotePatterns: [
       ...(imageDomain
