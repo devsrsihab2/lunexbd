@@ -3,8 +3,6 @@ import type { ApiResponse } from "@/types/api.types";
 
 const wpApiUrl = process.env.NEXT_PUBLIC_WP_API_URL;
 
-const PRODUCT_REVALIDATE_SECONDS = 300;
-
 type QueryValue = string | number | boolean | null | undefined;
 
 type WooStoreImage = {
@@ -115,18 +113,11 @@ async function fetchWooStore<T>(
   options?: RequestInit & { noStore?: boolean },
 ): Promise<ApiResponse<T>> {
   try {
-    const { noStore, ...fetchOptions } = options || {};
-    const shouldNoStore = Boolean(noStore) || typeof window !== "undefined";
+    const { noStore: _noStore, ...fetchOptions } = options || {};
 
     const response = await fetch(buildUrl(path, query), {
       method: "GET",
-      cache: shouldNoStore ? "no-store" : "force-cache",
-      next: shouldNoStore
-        ? undefined
-        : {
-            revalidate: PRODUCT_REVALIDATE_SECONDS,
-            tags: ["products"],
-          },
+      cache: "no-store",
       headers: {
         Accept: "application/json",
         ...(fetchOptions.headers || {}),
