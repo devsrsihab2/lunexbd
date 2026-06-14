@@ -19,12 +19,12 @@
 .serviceInner {
   @include container;
   display: flex;
-  min-height: 2.9rem;
+  min-height: 2.45rem;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  font-size: clamp(0.72rem, 1.5vw, 0.9rem);
-  letter-spacing: 0;
+  font-size: clamp(0.68rem, 1vw, 0.78rem);
+  letter-spacing: 0.02em;
   text-transform: uppercase;
 }
 
@@ -33,13 +33,13 @@
 .serviceLeft span {
   display: flex;
   align-items: center;
-  gap: 0.55rem;
+  gap: 0.5rem;
   min-width: 0;
 }
 
 .serviceInner a {
   color: #fff;
-  font-weight: 700;
+  font-weight: 750;
   text-decoration: none;
 }
 
@@ -51,19 +51,19 @@
 }
 
 .serviceInner svg {
-  width: 1.35rem;
-  height: 1.35rem;
+  width: 1.1rem;
+  height: 1.1rem;
 }
 
 .serviceLeft {
   min-width: 0;
-  gap: 1.55rem;
+  gap: clamp(0.9rem, 1.5vw, 1.45rem);
 }
 
 .serviceLeft i {
   width: 1px;
-  height: 1.35rem;
-  background: rgba(255, 255, 255, 0.45);
+  height: 1.05rem;
+  background: rgba(255, 255, 255, 0.38);
 }
 
 .serviceLeft strong {
@@ -71,27 +71,30 @@
 }
 
 .mainBar {
-  background: radial-gradient(circle at 7% 50%, rgba(255, 255, 255, 0.95), transparent 30%), #fbf3e8;
+  background:
+    radial-gradient(circle at 7% 50%, rgba(255, 255, 255, 0.96), transparent 30%),
+    #fbf3e8;
 }
 
 .inner {
   @include container;
   display: grid;
   grid-template-columns: auto 1fr auto;
-  min-height: 6.7rem;
+  min-height: 5.75rem;
   align-items: center;
-  gap: clamp(1rem, 2.1vw, 2rem);
+  gap: clamp(0.75rem, 1.2vw, 1.25rem);
 
   @include lg {
-    grid-template-columns: 18.5rem 1fr auto;
+    grid-template-columns: minmax(7.5rem, 11rem) minmax(0, 1fr) auto;
   }
 }
 
 .brand {
   display: inline-flex;
   align-items: center;
-  gap: 0.85rem;
+  gap: 0.7rem;
   width: fit-content;
+  min-width: 0;
   color: #111;
   text-decoration: none;
 }
@@ -99,42 +102,42 @@
 .brand img,
 .logoImage {
   width: auto;
-  max-width: 14rem;
-  max-height: 4.75rem;
+  max-width: clamp(6.5rem, 9vw, 10rem);
+  max-height: 4.25rem;
   height: auto;
   object-fit: contain;
 }
 
 .mark {
   display: grid;
-  width: 4.15rem;
-  height: 4.55rem;
+  width: 3.35rem;
+  height: 3.85rem;
   place-items: center;
   color: #111;
   font-family: Georgia, "Times New Roman", serif;
-  font-size: 5rem;
+  font-size: 4.35rem;
   font-weight: 400;
   line-height: 0.85;
 }
 
 .wordmark {
   display: grid;
-  gap: 0.2rem;
+  gap: 0.16rem;
 }
 
 .wordmark strong {
   font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(2.25rem, 4vw, 3.5rem);
+  font-size: clamp(1.9rem, 2.6vw, 2.75rem);
   font-weight: 400;
   line-height: 0.82;
-  letter-spacing: 0.24em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
 }
 
 .wordmark small {
   color: #111;
-  font-size: 0.76rem;
-  letter-spacing: 0.34em;
+  font-size: 0.66rem;
+  letter-spacing: 0.25em;
   text-transform: uppercase;
 }
 
@@ -143,106 +146,218 @@
 
   @include lg {
     display: flex;
+    min-width: 0;
     align-items: center;
-    justify-content: center;
-    gap: clamp(1.15rem, 1.55vw, 2rem);
+    justify-content: flex-end;
+    gap: clamp(0.45rem, 0.75vw, 0.9rem);
   }
 }
 
 .navItem {
   position: relative;
+  flex: 0 0 auto;
 }
 
-.navItem > a {
+.navItem > a,
+.moreButton {
   position: relative;
   display: inline-flex;
-  min-height: 2.25rem;
+  min-height: 2.15rem;
   align-items: center;
+  justify-content: center;
   gap: 0.25rem;
+  border: 0;
+  background: transparent;
   color: #12100e;
-  font-size: 0.92rem;
-  font-weight: 800;
+  cursor: pointer;
+  font: inherit;
+  font-size: clamp(0.68rem, 0.78vw, 0.8rem);
+  font-weight: 850;
+  letter-spacing: 0.015em;
+  line-height: 1.15;
+  text-align: center;
   text-decoration: none;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
-.navItem > a::after {
+.navItem > a span,
+.moreButton span {
+  display: inline-block;
+  max-width: 7.8rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.navItem > a::after,
+.moreButton::after {
   position: absolute;
   right: 0;
-  bottom: -0.15rem;
+  bottom: -0.18rem;
   left: 0;
   height: 1px;
   background: #1c1712;
   content: "";
   opacity: 0;
   transform: scaleX(0.45);
-  transition: opacity 160ms ease, transform 160ms ease;
+  transform-origin: center;
+  transition:
+    opacity 160ms ease,
+    transform 160ms ease;
 }
 
 .navItem > a:hover::after,
 .navItem > a:focus-visible::after,
-.navItem > a.active::after {
+.navItem > a.active::after,
+.moreButton:hover::after,
+.moreButton:focus-visible::after {
   opacity: 1;
   transform: scaleX(1);
 }
 
-.navItem svg {
-  width: 0.85rem;
-  height: 0.85rem;
+.active {
+  color: #111;
+}
+
+.chevronIcon {
+  width: 0.72rem !important;
+  height: 0.72rem !important;
+  flex: 0 0 auto;
+  color: rgba(18, 16, 14, 0.66);
+  transform: translateY(1px);
+  transition:
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.navItem:hover .chevronIcon,
+.navItem:focus-within .chevronIcon {
+  color: #cc8780;
+  transform: translateY(1px) rotate(180deg);
 }
 
 .dropdown {
   position: absolute;
-  top: calc(100% + 0.75rem);
-  left: 0;
+  top: calc(100% + 0.65rem);
+  left: 50%;
   z-index: calc($z-header + 10);
   display: grid;
-  min-width: 13rem;
-  gap: 0.25rem;
-  padding: 0.75rem;
-  border: 1px solid rgba(110, 76, 56, 0.16);
-  border-radius: 3px;
-  background: #fffaf3;
-  box-shadow: 0 18px 38px rgba(22, 15, 10, 0.16);
+  min-width: 13.5rem;
+  gap: 0.18rem;
+  padding: 0.55rem;
+  border: 1px solid rgba(110, 76, 56, 0.14);
+  border-radius: 10px;
+  background: rgba(255, 250, 243, 0.98);
+  box-shadow: 0 20px 45px rgba(22, 15, 10, 0.16);
   opacity: 0;
-  transform: translateY(8px);
+  transform: translate(-50%, 8px);
   visibility: hidden;
-  transition: opacity 160ms ease, transform 160ms ease, visibility 160ms ease;
+  transition:
+    opacity 160ms ease,
+    transform 160ms ease,
+    visibility 160ms ease;
+}
+
+.dropdown::before {
+  position: absolute;
+  top: -0.42rem;
+  left: 50%;
+  width: 0.8rem;
+  height: 0.8rem;
+  border-top: 1px solid rgba(110, 76, 56, 0.14);
+  border-left: 1px solid rgba(110, 76, 56, 0.14);
+  background: rgba(255, 250, 243, 0.98);
+  content: "";
+  transform: translateX(-50%) rotate(45deg);
 }
 
 .dropdown a {
-  padding: 0.65rem 0.75rem;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  min-height: 2.45rem;
+  align-items: center;
+  border-radius: 7px;
+  padding: 0.62rem 0.75rem;
   color: #221a14;
-  font-size: 0.85rem;
-  font-weight: 700;
+  font-size: 0.78rem;
+  font-weight: 750;
+  letter-spacing: 0.01em;
+  line-height: 1.25;
   text-decoration: none;
   text-transform: uppercase;
 }
 
 .dropdown a:hover,
-.dropdown a:focus-visible {
-  background: #f2e4d4;
+.dropdown a:focus-visible,
+.dropdown a.active {
+  background: rgba(204, 135, 128, 0.12);
+  color: #9f5d56;
 }
 
 .navItem:hover .dropdown,
 .navItem:focus-within .dropdown {
   opacity: 1;
-  transform: translateY(0);
+  transform: translate(-50%, 0);
   visibility: visible;
+}
+
+.moreNavItem {
+  margin-left: 0.1rem;
+}
+
+.moreButton {
+  padding: 0;
+}
+
+.moreDropdown {
+  right: 0;
+  left: auto;
+  width: 15.5rem;
+  transform: translateY(8px);
+}
+
+.moreDropdown::before {
+  right: 1.25rem;
+  left: auto;
+  transform: rotate(45deg);
+}
+
+.moreNavItem:hover .moreDropdown,
+.moreNavItem:focus-within .moreDropdown {
+  transform: translateY(0);
+}
+
+.moreGroup {
+  display: grid;
+}
+
+.moreChildren {
+  display: grid;
+  margin: -0.1rem 0 0.25rem 0.6rem;
+  padding-left: 0.65rem;
+  border-left: 1px solid rgba(204, 135, 128, 0.18);
+}
+
+.moreChildren a {
+  min-height: 2.1rem;
+  color: #6f554b;
+  font-size: 0.72rem;
 }
 
 .actions {
   display: inline-flex;
+  flex: 0 0 auto;
   align-items: center;
   justify-content: end;
-  gap: clamp(0.65rem, 1.2vw, 1.25rem);
+  gap: clamp(0.42rem, 0.7vw, 0.75rem);
 }
 
 .actions a {
   position: relative;
   display: inline-grid;
-  width: 2.4rem;
-  height: 2.4rem;
+  width: 2.15rem;
+  height: 2.15rem;
   place-items: center;
   color: #111;
   text-decoration: none;
@@ -251,9 +366,9 @@
 .searchForm {
   position: relative;
   display: grid;
-  width: 2.4rem;
-  height: 2.4rem;
-  grid-template-columns: minmax(0, 1fr) 2.4rem;
+  width: 2.15rem;
+  height: 2.15rem;
+  grid-template-columns: minmax(0, 1fr) 2.15rem;
   align-items: center;
   border: 1px solid transparent;
   border-radius: 999px;
@@ -276,9 +391,10 @@
   height: 100%;
   border: 0;
   background: transparent;
-  padding: 0 0 0 1rem;
+  padding: 0 0 0 0.9rem;
   color: #111;
   font: inherit;
+  font-size: 0.86rem;
   opacity: 0;
   outline: 0;
   pointer-events: none;
@@ -287,8 +403,8 @@
 
 .searchForm button {
   display: grid;
-  width: 2.4rem;
-  height: 2.4rem;
+  width: 2.15rem;
+  height: 2.15rem;
   place-items: center;
   border: 0;
   border-radius: 999px;
@@ -298,9 +414,9 @@
 }
 
 .searchOpen {
-  width: min(18rem, 28vw);
-  border-color: rgba(15, 107, 85, 0.24);
-  background: rgba(255, 255, 255, 0.78);
+  width: min(14rem, 18vw);
+  border-color: rgba(204, 135, 128, 0.28);
+  background: rgba(255, 255, 255, 0.8);
   box-shadow: 0 10px 26px rgba(28, 20, 14, 0.1);
 }
 
@@ -310,23 +426,23 @@
 }
 
 .actions svg {
-  width: 1.85rem;
-  height: 1.85rem;
+  width: 1.45rem;
+  height: 1.45rem;
 }
 
 .cart span {
   position: absolute;
   top: -0.1rem;
-  right: -0.1rem;
+  right: -0.08rem;
   display: grid;
-  min-width: 1.12rem;
-  height: 1.12rem;
+  min-width: 1rem;
+  height: 1rem;
   place-items: center;
-  border-radius: 999px;
   border: 1px solid #fffaf2;
+  border-radius: 999px;
   background: #cc8780;
   color: #fff;
-  font-size: 0.66rem;
+  font-size: 0.6rem;
   font-weight: 800;
   box-shadow: 0 5px 12px rgba(204, 135, 128, 0.32);
 }
@@ -574,6 +690,29 @@
   font-size: 0.86rem;
 }
 
+@media (max-width: 74.99rem) {
+  .nav {
+    display: none;
+  }
+
+  .menuButton {
+    display: inline-grid;
+  }
+
+  .inner {
+    grid-template-columns: auto 1fr auto;
+  }
+
+  .brand {
+    justify-self: center;
+  }
+
+  .brand img,
+  .logoImage {
+    max-width: 8.75rem;
+  }
+}
+
 @media (max-width: 47.99rem) {
   .serviceInner {
     justify-content: center;
@@ -596,7 +735,6 @@
   }
 
   .brand {
-    justify-self: center;
     gap: 0.45rem;
   }
 

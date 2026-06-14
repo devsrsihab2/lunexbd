@@ -2,13 +2,15 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
 import { useCart } from "@/hooks/useCart";
 import type { MenuItem, SiteSettings } from "@/types/content.types";
 import { MobileMenu } from "./MobileMenu";
 import { SearchBox } from "./SearchBox";
 import styles from "./Header.module.scss";
+
+const DESKTOP_VISIBLE_MENU_LIMIT = 8;
 
 const fallbackMenu: MenuItem[] = [
   { label: "Home", href: "/" },
@@ -23,8 +25,10 @@ const fallbackMenu: MenuItem[] = [
 
 function Icon({
   name,
+  className,
 }: {
   name: "truck" | "support" | "search" | "user" | "heart" | "bag" | "chevron";
+  className?: string;
 }) {
   const common = {
     width: 24,
@@ -35,6 +39,7 @@ function Icon({
     strokeWidth: 1.8,
     strokeLinecap: "round" as const,
     strokeLinejoin: "round" as const,
+    className,
     "aria-hidden": true,
   };
 
@@ -95,8 +100,21 @@ function Icon({
   }
 
   return (
-    <svg {...common} width="14" height="14">
-      <path d="m4 6 4 4 4-4" />
+    <svg
+      width="12"
+      height="12"
+      viewBox="0 0 12 12"
+      fill="none"
+      className={className}
+      aria-hidden="true"
+    >
+      <path
+        d="M3 4.5 6 7.5l3-3"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }
@@ -133,15 +151,39 @@ function normalizeCategoryHref(href: string) {
   const lastSlug = parts[parts.length - 1];
   let normalizedHref = `${categoryPrefix}${lastSlug}`;
 
-  if (hash) {
-    normalizedHref += `#${hash}`;
-  }
-
-  if (query) {
-    normalizedHref += `?${query}`;
-  }
+  if (hash) normalizedHref += `#${hash}`;
+  if (query) normalizedHref += `?${query}`;
 
   return normalizedHref;
+}
+
+function isMenuActive(pathname: string | null, href: string) {
+  const hrefPath = href.split("?")[0].split("#")[0];
+
+  if (hrefPath === "/") return pathname === "/";
+  return Boolean(pathname?.startsWith(hrefPath));
+}
+
+function DesktopDropdownLinks({
+  items,
+  parentKey,
+}: {
+  items: MenuItem[];
+  parentKey: string;
+}) {
+  return (
+    <div className={styles.dropdown}>
+      {items.map((child, childIndex) => {
+        const childHref = normalizeCategoryHref(child.href);
+
+        return (
+          <Link key={menuKey(child, childIndex, parentKey)} href={childHref}>
+            {child.label}
+          </Link>
+        );
+      })}
+    </div>
+  );
 }
 
 export function Header({
@@ -161,11 +203,19 @@ export function Header({
     cart?.items?.reduce((total, item) => total + item.quantity, 0) || 0;
   const primaryMenu = menu.length ? menu : fallbackMenu;
 
+  const { visibleMenu, overflowMenu } = useMemo(() => {
+    return {
+      visibleMenu: primaryMenu.slice(0, DESKTOP_VISIBLE_MENU_LIMIT),
+      overflowMenu: primaryMenu.slice(DESKTOP_VISIBLE_MENU_LIMIT),
+    };
+  }, [primaryMenu]);
+
   const dealLink =
     settings?.deals?.href ||
     settings?.topBanner?.href ||
     topMenu[0]?.href ||
     "/products";
+
   const dealLabel =
     settings?.deals?.label ||
     settings?.topBanner?.badge ||
@@ -184,8 +234,8 @@ export function Header({
     settings?.contactPhone ||
     settings?.serviceBar?.supportText ||
     "Help & Support";
-  const supportHref = settings?.serviceBar?.supportHref || "/contact";
 
+  const supportHref = settings?.serviceBar?.supportHref || "/contact";
   const logoIsLocal = settings?.logo?.startsWith("/");
 
   useEffect(() => {
@@ -273,13 +323,9 @@ export function Header({
           </Link>
 
           <nav className={styles.nav} aria-label="Main navigation">
-            {primaryMenu.map((item, index) => {
+            {visibleMenu.map((item, index) => {
               const normalizedHref = normalizeCategoryHref(item.href);
-              const hrefPath = normalizedHref.split("?")[0].split("#")[0];
-              const isActive =
-                hrefPath === "/"
-                  ? pathname === "/"
-                  : pathname?.startsWith(hrefPath);
+              const isActive = isMenuActive(pathname, normalizedHref);
 
               return (
                 <div
@@ -290,29 +336,77 @@ export function Header({
                     className={isActive ? styles.active : undefined}
                     href={normalizedHref}
                   >
-                    {item.label}
-                    {item.children?.length ? <Icon name="chevron" /> : null}
+                    <span>{item.label}</span>
+                    {item.children?.length ? (
+                      <Icon name="chevron" className={styles.chevronIcon} />
+                    ) : null}
                   </Link>
 
                   {item.children?.length ? (
-                    <div className={styles.dropdown}>
-                      {item.children.map((child, childIndex) => {
-                        const childHref = normalizeCategoryHref(child.href);
-
-                        return (
-                          <Link
-                            key={menuKey(child, childIndex, `header-${index}`)}
-                            href={childHref}
-                          >
-                            {child.label}
-                          </Link>
-                        );
-                      })}
-                    </div>
+                    <DesktopDropdownLinks
+                      items={item.children}
+                      parentKey={`header-${index}`}
+                    />
                   ) : null}
                 </div>
               );
             })}
+
+            {overflowMenu.length ? (
+              <div className={`${styles.navItem} ${styles.moreNavItem}`}>
+                <button className={styles.moreButton} type="button">
+                  <span>More</span>
+                  <Icon name="chevron" className={styles.chevronIcon} />
+                </button>
+
+                <div className={`${styles.dropdown} ${styles.moreDropdown}`}>
+                  {overflowMenu.map((item, index) => {
+                    const normalizedHref = normalizeCategoryHref(item.href);
+
+                    return (
+                      <div
+                        className={styles.moreGroup}
+                        key={menuKey(item, index, "more")}
+                      >
+                        <Link
+                          className={
+                            isMenuActive(pathname, normalizedHref)
+                              ? styles.active
+                              : undefined
+                          }
+                          href={normalizedHref}
+                        >
+                          {item.label}
+                        </Link>
+
+                        {item.children?.length ? (
+                          <div className={styles.moreChildren}>
+                            {item.children.map((child, childIndex) => {
+                              const childHref = normalizeCategoryHref(
+                                child.href,
+                              );
+
+                              return (
+                                <Link
+                                  key={menuKey(
+                                    child,
+                                    childIndex,
+                                    `more-${index}`,
+                                  )}
+                                  href={childHref}
+                                >
+                                  {child.label}
+                                </Link>
+                              );
+                            })}
+                          </div>
+                        ) : null}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : null}
           </nav>
 
           <nav className={styles.actions} aria-label="Shop shortcuts">
