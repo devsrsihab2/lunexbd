@@ -1,0 +1,165 @@
+@use "@/styles/abstracts/mixins" as *;
+@use "@/styles/abstracts/variables" as *;
+
+.contactPage {
+  @include container;
+  display: grid;
+  gap: clamp(1.6rem, 4vw, 3rem);
+  padding-block: clamp(2rem, 4vw, 4rem);
+}
+
+.contactStage {
+  display: grid;
+  grid-template-columns: minmax(16rem, 0.9fr) minmax(0, 1fr);
+  gap: clamp(1.5rem, 5vw, 4rem);
+  align-items: center;
+}
+
+.illustration {
+  position: relative;
+  display: grid;
+  min-height: clamp(24rem, 42vw, 34rem);
+  place-items: end center;
+  overflow: hidden;
+}
+
+.person {
+  position: relative;
+  z-index: 1;
+  width: min(18rem, 70vw);
+  height: min(26rem, 92vw);
+}
+
+.head,
+.body,
+.laptop,
+.chair,
+.plant,
+.lamp {
+  position: absolute;
+}
+
+.head {
+  top: 1.4rem;
+  left: 7.6rem;
+  width: 4.1rem;
+  height: 4.4rem;
+  border-radius: 48% 52% 46% 54%;
+  background: #f1a36f;
+  box-shadow: inset -0.45rem -0.35rem 0 #c95f32;
+}
+
+.head::before {
+  position: absolute;
+  top: -0.55rem;
+  left: -0.35rem;
+  width: 4rem;
+  height: 2.1rem;
+  border-radius: 999px 999px 0 0;
+  background: #d65c27;
+  content: "";
+}
+
+.body {
+  top: 6rem;
+  left: 5.3rem;
+  width: 7.7rem;
+  height: 10.2rem;
+  border-radius: 3rem 3rem 1.4rem 1.4rem;
+  background: #f5b51f;
+}
+
+.body::after {
+  position: absolute;
+  right: -1.4rem;
+  bottom: -5.2rem;
+  width: 6.2rem;
+  height: 8.3rem;
+  border-radius: 999px;
+  background: #252836;
+  content: "";
+  transform: rotate(-20deg);
+}
+
+.laptop {
+  top: 10rem;
+  left: 8.6rem;
+  width: 8.8rem;
+  height: 5.6rem;
+  border-radius: 0.35rem;
+  background: #56606c;
+  transform: skew(-10deg) rotate(4deg);
+}
+
+.chair {
+  right: 2rem;
+  bottom: 0.8rem;
+  left: 3.4rem;
+  height: 1rem;
+  border-radius: 999px;
+  background: #d1b08a;
+  box-shadow:
+    -2.8rem -5.5rem 0 2.2rem #62b875,
+    1.7rem 4.8rem 0 -0.25rem #9d775d;
+}
+
+.plant {
+  left: 0;
+  bottom: 1rem;
+  width: 5rem;
+  height: 8rem;
+  border-bottom: 4rem solid #d9d5c9;
+  border-left: 1rem solid transparent;
+  border-right: 1rem solid transparent;
+}
+
+.plant::before,
+.plant::after {
+  position: absolute;
+  bottom: 3.2rem;
+  width: 3.2rem;
+  height: 5rem;
+  border-radius: 100% 0;
+  background: #55b66b;
+  content: "";
+}
+
+.plant::before {
+  left: -0.2rem;
+  transform: rotate(-24deg);
+}
+
+.plant::after {
+  right: -0.3rem;
+  border-radius: 0 100%;
+  transform: rotate(25deg);
+}
+
+.lamp {
+  right: 0.2rem;
+  bottom: 5.6rem;
+  width: 0.45rem;
+  height: 14rem;
+  background: #57535c;
+}
+
+.lamp::before {
+  position: absolute;
+  top: -2.7rem;
+  left: -1.55rem;
+  width: 3.8rem;
+  height: 2.8rem;
+  border-radius: 0.45rem 0.45rem 1.1rem 1.1rem;
+  background: #ded8d0;
+  content: "";
+}
+
+@media (max-width: 840px) {
+  .contactStage {
+    grid-template-columns: 1fr;
+  }
+
+  .illustration {
+    min-height: 20rem;
+  }
+}

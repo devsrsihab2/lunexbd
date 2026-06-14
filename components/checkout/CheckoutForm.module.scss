@@ -505,3 +505,21 @@
     justify-self: end;
   }
 }
+
+.qtyRow button:first-of-type {
+  font-size: 0;
+}
+
+.qtyRow button:first-of-type::before {
+  content: "−";
+  display: block;
+  color: currentColor;
+  font-size: 1.45rem;
+  font-weight: 900;
+  line-height: 1;
+  transform: translateY(-1px);
+}
+
+.qtyRow button:last-of-type {
+  font-size: 1.25rem;
+}

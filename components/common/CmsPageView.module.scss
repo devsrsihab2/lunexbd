@@ -11,52 +11,9 @@ $soft: #fcf5f4;
 
 .cmsPage {
   @include container;
+  display: grid;
+  gap: clamp(1rem, 2vw, 1.5rem);
   padding-block: clamp(2rem, 4vw, 4rem);
-}
-
-.hero {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 1.5rem;
-  margin-bottom: clamp(1rem, 2vw, 1.5rem);
-  padding: clamp(1.4rem, 3vw, 2.4rem);
-  border: 1px solid $line;
-  border-radius: $radius-md;
-  background:
-    linear-gradient(135deg, rgba($brand, 0.18), rgba(255, 255, 255, 0.96) 42%, rgba($brand, 0.08)),
-    $paper;
-  box-shadow: 0 20px 60px rgba(64, 43, 41, 0.08);
-
-  h1 {
-    margin: 0.35rem 0 0.55rem;
-    color: $ink;
-    font-size: clamp(2rem, 4.4vw, 4rem);
-    line-height: 1.02;
-    letter-spacing: 0;
-  }
-
-  p {
-    max-width: 38rem;
-    margin: 0;
-    color: $muted;
-    font-size: clamp(0.98rem, 1.5vw, 1.08rem);
-    line-height: 1.7;
-  }
-
-  > span {
-    flex: 0 0 auto;
-    display: inline-flex;
-    align-items: center;
-    min-height: 2.35rem;
-    padding: 0 0.85rem;
-    border: 1px solid rgba($brand, 0.26);
-    border-radius: 999px;
-    background: rgba($brand, 0.1);
-    color: $brand-deep;
-    font-size: 0.82rem;
-    font-weight: 800;
-  }
 }
 
 .eyebrow {
@@ -170,15 +127,6 @@ $soft: #fcf5f4;
 }
 
 @media (max-width: 760px) {
-  .hero {
-    align-items: stretch;
-    flex-direction: column;
-
-    > span {
-      width: fit-content;
-    }
-  }
-
   .contentShell {
     padding: 1rem;
   }

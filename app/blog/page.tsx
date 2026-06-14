@@ -1,4 +1,5 @@
 import { connection } from "next/server";
+import { PageBanner } from "@/components/common/PageBanner";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { getBlogPosts } from "@/services/api/content.api";
@@ -11,16 +12,20 @@ export default async function BlogPage() {
 
   return (
     <main className={styles.blogPage}>
-      <section className={styles.hero}>
-        <p className={styles.eyebrow}>Lunexbd Journal</p>
-        <h1 className={styles.heading}>Blog</h1>
-        <p className={styles.subtitle}>Latest stories, product notes, styling ideas, and ecommerce updates from WordPress.</p>
-      </section>
+      <PageBanner
+        eyebrow="Lunexbd Journal"
+        title="Blog"
+        text="Latest stories, product notes, styling ideas, and ecommerce updates from WordPress."
+        image="/lunex/landscap-3.webp"
+      />
 
       {!posts.success ? (
         <ErrorState message={posts.message} retryHref="/blog" />
       ) : !posts.data.length ? (
-        <EmptyState title="No posts yet" message="WordPress posts will appear here." />
+        <EmptyState
+          title="No posts yet"
+          message="WordPress posts will appear here."
+        />
       ) : (
         <BlogList initialPosts={posts} />
       )}

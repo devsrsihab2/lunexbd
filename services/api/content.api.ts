@@ -41,3 +41,7 @@ export function getBlogPost(slug: string) {
 export function submitContact(payload: unknown) {
   return storefrontProxy<{ received: boolean; id?: number }>("/contact", { method: "POST", body: payload });
 }
+
+export function submitSubscription(payload: unknown) {
+  return storefrontProxy<{ subscribed: boolean; id?: number }>("/subscribe", { method: "POST", body: payload });
+}

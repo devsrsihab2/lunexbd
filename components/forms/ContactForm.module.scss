@@ -4,9 +4,9 @@
 
 .formShell {
   display: grid;
-  gap: $space-5;
-  max-width: 46rem;
-  padding: clamp(1.25rem, 3vw, 2rem);
+  gap: $space-4;
+  width: 100%;
+  padding: clamp(1.35rem, 3vw, 2.4rem);
   border: 1px solid rgba($primary-color, 0.22);
   border-radius: $radius-md;
   background: #fff;
@@ -30,7 +30,7 @@
 .title {
   margin: 0;
   color: $color-ink;
-  font-size: clamp(1.35rem, 2vw, 1.75rem);
+  font-size: clamp(1.75rem, 3vw, 2.35rem);
 }
 
 .text {
@@ -57,7 +57,7 @@
   min-height: 3rem;
   border-color: $primary-color;
   background: $primary-color;
-  box-shadow: 0 14px 28px rgba($primary-color, 0.24);
+  box-shadow: 0 14px 28px rgba($primary-color, 0.25);
 
   &:hover:not(:disabled) {
     background: color.adjust($primary-color, $lightness: -7%);

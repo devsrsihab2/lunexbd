@@ -11,7 +11,11 @@ import "./globals.scss";
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSettings();
 
-  return createMetadata({ favicon: settings.success ? settings.data.favicon : undefined });
+  return createMetadata({
+    siteName: settings.success ? settings.data.siteName : undefined,
+    description: settings.success ? settings.data.tagline : undefined,
+    favicon: settings.success ? settings.data.favicon : undefined,
+  });
 }
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

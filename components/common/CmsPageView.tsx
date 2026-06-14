@@ -1,5 +1,6 @@
 import { connection } from "next/server";
 import { ErrorState } from "@/components/ui/ErrorState";
+import { PageBanner } from "@/components/common/PageBanner";
 import { getCmsPageWithFallbacks } from "@/services/api/content.api";
 import { sanitizeHtml } from "@/utils/sanitizeHtml";
 import styles from "./CmsPageView.module.scss";
@@ -22,14 +23,12 @@ export async function CmsPageView({
 
   return (
     <main className={styles.cmsPage}>
-      <section className={styles.hero}>
-        <div>
-          <p className={styles.eyebrow}>Lunexbd</p>
-          <h1>{displayTitle}</h1>
-          <p>Please review the latest information below.</p>
-        </div>
-        <span>{page.success ? "Official page" : "Needs attention"}</span>
-      </section>
+      <PageBanner
+        title={displayTitle}
+        text="Please review the latest information below."
+        badge={page.success ? "Official page" : "Needs attention"}
+        image="/lunex/landscap-2.webp"
+      />
 
       <section className={styles.contentShell}>
         {!page.success ? (
@@ -37,7 +36,9 @@ export async function CmsPageView({
         ) : (
           <article
             className={styles.content}
-            dangerouslySetInnerHTML={{ __html: sanitizeHtml(page.data.content) }}
+            dangerouslySetInnerHTML={{
+              __html: sanitizeHtml(page.data.content),
+            }}
           />
         )}
       </section>

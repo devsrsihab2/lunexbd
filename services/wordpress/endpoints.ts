@@ -22,4 +22,5 @@ export const lunexEndpoints = [
   "POST /wp-json/lunex/v1/wishlist",
   "DELETE /wp-json/lunex/v1/wishlist/{productId}",
   "POST /wp-json/lunex/v1/contact",
+  "POST /wp-json/lunex/v1/subscribe",
 ];

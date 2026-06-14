@@ -3,6 +3,7 @@ import { DEFAULT_DESCRIPTION, SITE_NAME } from "./constants";
 
 export function createMetadata(input: {
   title?: string;
+  siteName?: string;
   description?: string;
   path?: string;
   image?: string;
@@ -10,7 +11,8 @@ export function createMetadata(input: {
   robots?: string;
 }): Metadata {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://lunexbd.com";
-  const title = input.title ? `${input.title} | ${SITE_NAME}` : SITE_NAME;
+  const siteName = input.siteName || SITE_NAME;
+  const title = input.title ? `${input.title} | ${siteName}` : siteName;
   const description = input.description || DEFAULT_DESCRIPTION;
   const canonical = new URL(input.path || "/", siteUrl).toString();
   const favicon = input.favicon || "/favicon.ico";

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import type { MenuItem, SiteSettings } from "@/types/content.types";
+import { FooterSubscribe } from "./FooterSubscribe";
 import styles from "./Footer.module.scss";
 
 const fallbackFooter: MenuItem[] = [
@@ -14,6 +15,14 @@ const shopLinks: MenuItem[] = [
   { label: "Latest Products", href: "/products?sort=latest" },
   { label: "Best Selling", href: "/products?sort=best_selling" },
   { label: "My Wishlist", href: "/wishlist" },
+];
+
+const paymentMethods = [
+  { label: "Payment method one", src: "/lunex/payment-one.svg" },
+  { label: "Payment method two", src: "/lunex/payment-two.svg" },
+  { label: "Payment method three", src: "/lunex/payment-three.svg" },
+  { label: "Payment method five", src: "/lunex/payment-five.svg" },
+  { label: "Payment method six", src: "/lunex/payment-six.svg" },
 ];
 
 function menuKey(item: MenuItem, index: number) {
@@ -107,6 +116,19 @@ export function Footer({
               ))}
             </div>
           ) : null}
+        </div>
+        <div className={styles.subscribeGroup}>
+          <FooterSubscribe />
+        </div>
+      </div>
+      <div className={styles.bottomBar}>
+        <p>All copyrights reserved lunex bd 2026</p>
+        <div className={styles.paymentBadges} aria-label="Supported payment methods">
+          {paymentMethods.map((payment) => (
+            <span key={payment.src}>
+              <Image src={payment.src} alt={payment.label} width={30} height={25} />
+            </span>
+          ))}
         </div>
       </div>
     </footer>

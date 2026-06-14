@@ -3,21 +3,10 @@
 
 .blogPage {
   @include container;
+  display: grid;
+  gap: clamp(1.5rem, 4vw, 2.5rem);
   padding-top: clamp(2rem, 4vw, 4rem);
   padding-bottom: clamp(3rem, 6vw, 5rem);
-}
-
-.hero {
-  display: grid;
-  gap: $space-4;
-  margin-bottom: clamp(1.5rem, 4vw, 2.5rem);
-  padding: clamp(1.4rem, 3vw, 2.25rem);
-  border: 1px solid rgba($primary-color, 0.22);
-  border-radius: $radius-md;
-  background:
-    linear-gradient(135deg, rgba($primary-color, 0.16), rgba(#fff, 0.96) 42%),
-    #fff;
-  box-shadow: 0 18px 50px rgba(35, 26, 24, 0.08);
 }
 
 .eyebrow,

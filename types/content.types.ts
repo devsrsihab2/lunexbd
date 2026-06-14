@@ -73,6 +73,7 @@ export type HomeContent = {
 
 export type SiteSettings = {
   siteName: string;
+  tagline?: string;
   logo?: string;
   footerLogo?: string;
   favicon?: string;

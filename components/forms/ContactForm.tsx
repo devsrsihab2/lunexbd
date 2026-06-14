@@ -20,7 +20,12 @@ export function ContactForm() {
       name: String(formData.get("name") || "").trim(),
       email: String(formData.get("email") || "").trim(),
       phone: String(formData.get("phone") || "").trim(),
-      message: String(formData.get("message") || "").trim(),
+      message: [
+        String(formData.get("subject") || "").trim()
+          ? `Subject: ${String(formData.get("subject") || "").trim()}`
+          : "",
+        String(formData.get("message") || "").trim(),
+      ].filter(Boolean).join("\n\n"),
     };
 
     setStatus("loading");
@@ -41,19 +46,17 @@ export function ContactForm() {
   return (
     <form className={styles.formShell} onSubmit={handleSubmit}>
       <div className={styles.header}>
-        <p className={styles.eyebrow}>Contact Lunexbd</p>
         <h2 className={styles.title}>Send us a message</h2>
-        <p className={styles.text}>Share your question and our team will review it from the WordPress dashboard.</p>
+        <p className={styles.text}>We are here to help. Send your question or comment and our team will respond promptly.</p>
       </div>
 
       <div className={styles.grid}>
         <Input label="Name" name="name" autoComplete="name" required />
+        <Input label="Phone" name="phone" type="tel" autoComplete="tel" />
         <Input label="Email" name="email" type="email" autoComplete="email" required />
+        <Input label="Subject" name="subject" />
         <div className={styles.full}>
-          <Input label="Phone" name="phone" type="tel" autoComplete="tel" />
-        </div>
-        <div className={styles.full}>
-          <Textarea label="Message" name="message" rows={6} required />
+          <Textarea label="Message" name="message" rows={5} required />
         </div>
       </div>
 

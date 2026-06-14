@@ -1,4 +1,3 @@
-import Image from "next/image";
 import type { HomeBanner, MenuItem } from "@/types/content.types";
 import { BannerSlider } from "./BannerSlider";
 import styles from "./HeroBanner.module.scss";
@@ -13,45 +12,6 @@ const fallbackBanner: HomeBanner = {
   scriptText: "Designed for You,",
   badgeText: "Timeless Design Endless Elegance",
 };
-
-const fallbackCollections = [
-  {
-    label: "Ladies Bag",
-    text: "Elegance Redefined",
-    href: "/category/ladies-bag",
-    image: "/lunex/ladies-bag.png",
-  },
-  {
-    label: "Men Bag",
-    text: "Style Meets Strength",
-    href: "/category/men-bag",
-    image: "/lunex/men-bag.png",
-  },
-  {
-    label: "Laptop Bag",
-    text: "Work in Style",
-    href: "/category/laptop-bag",
-    image: "/lunex/laptop-bag.png",
-  },
-  {
-    label: "Wallet",
-    text: "Small But Essential",
-    href: "/category/wallet",
-    image: "/lunex/wallet.png",
-  },
-  {
-    label: "Travel Bag",
-    text: "Your Perfect Companion",
-    href: "/category/travel-bag",
-    image: "/lunex/travel-bag.png",
-  },
-  {
-    label: "Backpack",
-    text: "Comfort Everywhere",
-    href: "/category/backpack",
-    image: "/lunex/backpack.png",
-  },
-];
 
 function LineIcon({
   name,
@@ -120,20 +80,12 @@ function LineIcon({
 
 export function HeroBanner({
   banners,
-  menu,
 }: {
   banners?: HomeBanner[];
   menu?: MenuItem[];
 }) {
   const slides = banners?.length ? banners : [fallbackBanner];
   const featured = slides[0] || fallbackBanner;
-  const collections = fallbackCollections.map((item, index) => {
-    const liveItem = menu?.[index];
-    return liveItem
-      ? { ...item, label: liveItem.label, href: liveItem.href }
-      : item;
-  });
-
   return (
     <section className={styles.heroWrap} aria-label="Lunex featured bags">
       <div className={styles.hero}>

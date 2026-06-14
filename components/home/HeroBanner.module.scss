@@ -12,7 +12,7 @@
 
   position: relative;
   display: grid;
-  min-height: clamp(36rem, 54vw, 41rem);
+  min-height: clamp(18rem, 30vw, 24rem);
   overflow: hidden;
 
   background: linear-gradient(90deg, #fff8ee 0%, #fbf1e4 39%, #ead9c7 100%);
@@ -28,17 +28,17 @@
   display: grid;
   align-content: center;
   justify-items: start;
-  gap: 1.05rem;
-  padding-top: clamp(2.2rem, 5vw, 4.5rem);
+  gap: 0.8rem;
+  padding-top: clamp(1rem, 2.6vw, 2rem);
   padding-right: clamp(1.25rem, 5.5vw, 5.4rem);
-  padding-bottom: clamp(2.2rem, 5vw, 4.5rem);
+  padding-bottom: clamp(1rem, 2.6vw, 2rem);
 }
 
 .script {
   margin: 0;
   color: #14110f;
   font-family: "Brush Script MT", "Segoe Script", cursive;
-  font-size: clamp(2.15rem, 4vw, 4rem);
+  font-size: clamp(1.55rem, 2.7vw, 2.55rem);
   line-height: 1;
 }
 
@@ -47,7 +47,7 @@
   margin: 0;
   color: #15110f;
   font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(3.05rem, 6.2vw, 6.65rem);
+  font-size: clamp(2.25rem, 4.35vw, 4.35rem);
   font-weight: 400;
   line-height: 0.96;
   overflow-wrap: anywhere;
@@ -79,7 +79,7 @@
   max-width: 23rem;
   margin: 0;
   color: #161514;
-  font-size: clamp(1rem, 1.4vw, 1.28rem);
+  font-size: clamp(0.92rem, 1.15vw, 1rem);
   line-height: 1.5;
 }
 
@@ -105,11 +105,11 @@
 }
 
 .assurance {
-  display: grid;
+  display: none;
   width: min(38rem, 100%);
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: clamp(0.75rem, 1.6vw, 1.35rem);
-  margin-top: 1.65rem;
+  margin-top: 0.85rem;
 }
 
 .assurance div,
@@ -148,7 +148,7 @@
 
 .art {
   position: relative;
-  min-height: 28rem;
+  min-height: 18rem;
   overflow: hidden;
 }
 
@@ -405,7 +405,7 @@
   }
 
   .art {
-    min-height: clamp(20rem, 58vw, 31rem);
+    min-height: clamp(16rem, 45vw, 22rem);
   }
 
   .slider {
@@ -414,9 +414,9 @@
 
   .copy {
     gap: 0.85rem;
-    padding-top: clamp(1.8rem, 5vw, 2.75rem);
+    padding-top: clamp(1.5rem, 4vw, 2.2rem);
     padding-right: 1rem;
-    padding-bottom: clamp(1.8rem, 5vw, 2.75rem);
+    padding-bottom: clamp(1.5rem, 4vw, 2.2rem);
     padding-left: 0;
   }
 
@@ -480,7 +480,7 @@
   }
 
   .art {
-    min-height: 19rem;
+    min-height: 15rem;
   }
 
   .badge {
