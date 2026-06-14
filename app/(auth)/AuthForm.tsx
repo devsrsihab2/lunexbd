@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 import { login, register } from "@/services/api/auth.api";
 import styles from "./auth.module.scss";
 
@@ -19,6 +19,9 @@ type TokenPayload = {
   access_token?: string;
   user?: unknown;
 };
+
+const SOCIAL_PROVIDERS = ["google", "facebook"] as const;
+type SocialProvider = (typeof SOCIAL_PROVIDERS)[number];
 
 function UserIcon() {
   return (
@@ -79,8 +82,26 @@ function FacebookIcon() {
 
 function readToken(data: unknown) {
   if (!data || typeof data !== "object") return "";
+
   const payload = data as TokenPayload;
+
   return payload.accessToken || payload.access_token || payload.token || "";
+}
+
+function safeRedirectPath(path?: string | null) {
+  if (!path) return "/account";
+
+  try {
+    const decoded = decodeURIComponent(path);
+
+    if (!decoded.startsWith("/") || decoded.startsWith("//")) {
+      return "/account";
+    }
+
+    return decoded;
+  } catch {
+    return "/account";
+  }
 }
 
 function saveSession(data: unknown) {
@@ -98,26 +119,94 @@ function saveSession(data: unknown) {
   window.dispatchEvent(new Event("lunex-auth-change"));
 }
 
-function getSocialHref(provider: "google" | "facebook", redirectTo: string, mode: Mode) {
-  const params = new URLSearchParams({ redirect: redirectTo, mode });
-  return `/api/lunex/auth/${provider}?${params.toString()}`;
+function saveSocialSessionFromUrl(searchParams: URLSearchParams) {
+  const token =
+    searchParams.get("accessToken") ||
+    searchParams.get("access_token") ||
+    searchParams.get("token");
+
+  if (!token) return false;
+
+  const userParam = searchParams.get("user");
+  let user: unknown = null;
+
+  if (userParam) {
+    try {
+      user = JSON.parse(decodeURIComponent(userParam));
+    } catch {
+      user = null;
+    }
+  }
+
+  saveSession({
+    accessToken: token,
+    token,
+    user,
+  });
+
+  return true;
 }
 
-export function AuthForm({ mode, redirectTo = "/" }: Props) {
+function getSocialHref(
+  provider: SocialProvider,
+  redirectTo: string,
+  mode: Mode,
+) {
+  const callbackUrl =
+    typeof window === "undefined"
+      ? `/login?redirect=${encodeURIComponent(redirectTo)}`
+      : `${window.location.origin}/login?redirect=${encodeURIComponent(redirectTo)}`;
+
+  const params = new URLSearchParams({
+    redirect: redirectTo,
+    callback: callbackUrl,
+    mode,
+  });
+
+  return `/api/storefront/auth/${provider}?${params.toString()}`;
+}
+
+export function AuthForm({ mode, redirectTo = "/account" }: Props) {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isRegister = mode === "register";
 
+  const safeRedirectTo = useMemo(
+    () => safeRedirectPath(redirectTo),
+    [redirectTo],
+  );
+
   useEffect(() => {
-    const token = localStorage.getItem("accessToken") || localStorage.getItem("token");
-    if (token) {
-      router.replace(redirectTo || "/account");
+    const error = searchParams.get("error") || searchParams.get("message");
+
+    if (error) {
+      setMessage(error);
+      return;
     }
-  }, [redirectTo, router]);
+
+    const hasSocialSession = saveSocialSessionFromUrl(searchParams);
+
+    if (hasSocialSession) {
+      router.replace(safeRedirectTo);
+      router.refresh();
+      return;
+    }
+
+    const token =
+      localStorage.getItem("accessToken") || localStorage.getItem("token");
+
+    if (token) {
+      router.replace(safeRedirectTo);
+    }
+  }, [router, safeRedirectTo, searchParams]);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
     setMessage("");
     setIsSubmitting(true);
 
@@ -154,9 +243,13 @@ export function AuthForm({ mode, redirectTo = "/" }: Props) {
     }
 
     saveSession(result.data);
-    router.push(redirectTo || "/account");
+    router.push(safeRedirectTo);
     router.refresh();
   }
+
+  const switchHref = isRegister
+    ? `/login?redirect=${encodeURIComponent(safeRedirectTo)}`
+    : `/register?redirect=${encodeURIComponent(safeRedirectTo)}`;
 
   return (
     <section className={styles.authShell} aria-labelledby={`${mode}-title`}>
@@ -165,14 +258,26 @@ export function AuthForm({ mode, redirectTo = "/" }: Props) {
           <span className={styles.headingIcon}>
             {isRegister ? <BadgeIcon /> : <UserIcon />}
           </span>
+
           <div>
-            <h1 id={`${mode}-title`}>{isRegister ? "Create Account" : "Signin"}</h1>
-            <p>{isRegister ? "Register quickly and continue shopping" : "Access your account securely"}</p>
+            <h1 id={`${mode}-title`}>
+              {isRegister ? "Create Account" : "Sign in"}
+            </h1>
+            <p>
+              {isRegister
+                ? "Register quickly and continue shopping"
+                : "Access your account securely"}
+            </p>
           </div>
         </div>
 
         <div className={styles.formCard}>
-          <h2>{isRegister ? "Register With Credentials" : "Login With Credentials"}</h2>
+          <h2>
+            {isRegister
+              ? "Register With Credentials"
+              : "Login With Credentials"}
+          </h2>
+
           <form onSubmit={handleSubmit} className={styles.form}>
             {isRegister ? (
               <div className={styles.nameGrid}>
@@ -180,14 +285,25 @@ export function AuthForm({ mode, redirectTo = "/" }: Props) {
                   <span>First name</span>
                   <span className={styles.inputWrap}>
                     <UserIcon />
-                    <input name="firstName" autoComplete="given-name" required placeholder="First name" />
+                    <input
+                      name="firstName"
+                      autoComplete="given-name"
+                      required
+                      placeholder="First name"
+                    />
                   </span>
                 </label>
+
                 <label className={styles.field}>
                   <span>Last name</span>
                   <span className={styles.inputWrap}>
                     <UserIcon />
-                    <input name="lastName" autoComplete="family-name" required placeholder="Last name" />
+                    <input
+                      name="lastName"
+                      autoComplete="family-name"
+                      required
+                      placeholder="Last name"
+                    />
                   </span>
                 </label>
               </div>
@@ -199,14 +315,26 @@ export function AuthForm({ mode, redirectTo = "/" }: Props) {
                   <span>Email address</span>
                   <span className={styles.inputWrap}>
                     <MailIcon />
-                    <input name="email" type="email" autoComplete="email" required placeholder="Email address" />
+                    <input
+                      name="email"
+                      type="email"
+                      autoComplete="email"
+                      required
+                      placeholder="Email address"
+                    />
                   </span>
                 </label>
+
                 <label className={styles.field}>
                   <span>Phone number</span>
                   <span className={styles.inputWrap}>
                     <UserIcon />
-                    <input name="phone" type="tel" autoComplete="tel" placeholder="Phone number" />
+                    <input
+                      name="phone"
+                      type="tel"
+                      autoComplete="tel"
+                      placeholder="Phone number"
+                    />
                   </span>
                 </label>
               </>
@@ -215,7 +343,12 @@ export function AuthForm({ mode, redirectTo = "/" }: Props) {
                 <span>Email or phone number</span>
                 <span className={styles.inputWrap}>
                   <UserIcon />
-                  <input name="username" autoComplete="username" required placeholder="Email or phone number" />
+                  <input
+                    name="username"
+                    autoComplete="username"
+                    required
+                    placeholder="Email or phone number"
+                  />
                 </span>
               </label>
             )}
@@ -224,7 +357,15 @@ export function AuthForm({ mode, redirectTo = "/" }: Props) {
               <span>Password</span>
               <span className={styles.inputWrap}>
                 <LockIcon />
-                <input name="password" type="password" autoComplete={isRegister ? "new-password" : "current-password"} required placeholder="Password" />
+                <input
+                  name="password"
+                  type="password"
+                  autoComplete={
+                    isRegister ? "new-password" : "current-password"
+                  }
+                  required
+                  placeholder="Password"
+                />
               </span>
             </label>
 
@@ -233,7 +374,13 @@ export function AuthForm({ mode, redirectTo = "/" }: Props) {
                 <span>Confirm password</span>
                 <span className={styles.inputWrap}>
                   <LockIcon />
-                  <input name="confirmPassword" type="password" autoComplete="new-password" required placeholder="Confirm password" />
+                  <input
+                    name="confirmPassword"
+                    type="password"
+                    autoComplete="new-password"
+                    required
+                    placeholder="Confirm password"
+                  />
                 </span>
               </label>
             ) : (
@@ -242,36 +389,53 @@ export function AuthForm({ mode, redirectTo = "/" }: Props) {
                   <input type="checkbox" name="remember" />
                   <span>Remember me</span>
                 </label>
+
                 <Link href="/forgot-password">Forgotten password?</Link>
               </div>
             )}
 
             {message ? <p className={styles.alert}>{message}</p> : null}
 
-            <button className={styles.submitButton} type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Please wait..." : isRegister ? "Register" : "Login"}
+            <button
+              className={styles.submitButton}
+              type="submit"
+              disabled={isSubmitting}
+            >
+              {isSubmitting
+                ? "Please wait..."
+                : isRegister
+                  ? "Register"
+                  : "Login"}
             </button>
           </form>
         </div>
 
         <div className={styles.divider}>
-          <span>{isRegister ? "or register with" : "or signin with"}</span>
+          <span>{isRegister ? "or register with" : "or sign in with"}</span>
         </div>
 
-        <div className={styles.socialRow} aria-label={isRegister ? "Social registration" : "Social login"}>
-          <a href={getSocialHref("google", redirectTo, mode)} aria-label={`${isRegister ? "Register" : "Login"} with Google`}>
+        <div
+          className={styles.socialRow}
+          aria-label={isRegister ? "Social registration" : "Social login"}
+        >
+          <a
+            href={getSocialHref("google", safeRedirectTo, mode)}
+            aria-label={`${isRegister ? "Register" : "Login"} with Google`}
+          >
             <GoogleIcon />
           </a>
-          <a href={getSocialHref("facebook", redirectTo, mode)} aria-label={`${isRegister ? "Register" : "Login"} with Facebook`}>
+
+          <a
+            href={getSocialHref("facebook", safeRedirectTo, mode)}
+            aria-label={`${isRegister ? "Register" : "Login"} with Facebook`}
+          >
             <FacebookIcon />
           </a>
         </div>
 
         <p className={styles.switchText}>
           {isRegister ? "Already have an account?" : "Don't have any account?"}{" "}
-          <Link href={isRegister ? `/login?redirect=${encodeURIComponent(redirectTo)}` : `/register?redirect=${encodeURIComponent(redirectTo)}`}>
-            {isRegister ? "Login" : "Register"}
-          </Link>
+          <Link href={switchHref}>{isRegister ? "Login" : "Register"}</Link>
         </p>
       </div>
     </section>
