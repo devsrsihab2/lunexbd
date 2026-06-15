@@ -448,7 +448,7 @@ export async function getProductById(
     return {
       success: false,
       data: null as unknown as Product,
-      message: "Product not found.",
+      message: "Product not found",
     };
   }
 
