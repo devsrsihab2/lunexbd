@@ -12,6 +12,24 @@ type WooStoreImage = {
   alt?: string;
 };
 
+type WooStoreAttributeTerm =
+  | string
+  | {
+      id?: number;
+      name?: string;
+      slug?: string;
+    };
+
+type WooStoreProductAttribute = {
+  id?: number;
+  name: string;
+  taxonomy?: string;
+  terms?: WooStoreAttributeTerm[];
+  options?: WooStoreAttributeTerm[];
+  variation?: boolean;
+  has_variations?: boolean;
+};
+
 type WooStoreProduct = {
   id: number;
   slug: string;
@@ -24,12 +42,7 @@ type WooStoreProduct = {
   review_count?: number;
   images?: WooStoreImage[];
   categories?: { id: number; name: string; slug: string }[];
-  attributes?: {
-    name: string;
-    terms?: string[];
-    options?: string[];
-    variation?: boolean;
-  }[];
+  attributes?: WooStoreProductAttribute[];
   variations?: Product["variations"];
   prices?: {
     price?: string;
@@ -181,6 +194,20 @@ function toMajorUnit(value?: string, minorUnit = 2) {
   return String(amount / 10 ** minorUnit);
 }
 
+function normalizeAttributeOptions(values?: WooStoreAttributeTerm[]): string[] {
+  if (!Array.isArray(values)) return [];
+
+  return values
+    .map((value) => {
+      if (typeof value === "string") {
+        return decodeHtml(value);
+      }
+
+      return decodeHtml(value.name || value.slug || "");
+    })
+    .filter(Boolean);
+}
+
 function mapWooProduct(product: WooStoreProduct): Product {
   const minorUnit = product.prices?.currency_minor_unit ?? 2;
 
@@ -200,6 +227,20 @@ function mapWooProduct(product: WooStoreProduct): Product {
     ];
   });
 
+  const attributes = (product.attributes || [])
+    .map((attribute) => {
+      const options = normalizeAttributeOptions(
+        attribute.terms || attribute.options || [],
+      );
+
+      return {
+        name: decodeHtml(attribute.name),
+        options,
+        variation: Boolean(attribute.variation || attribute.has_variations),
+      };
+    })
+    .filter((attribute) => attribute.name && attribute.options.length);
+
   return {
     id: product.id,
     slug: product.slug,
@@ -218,11 +259,7 @@ function mapWooProduct(product: WooStoreProduct): Product {
     reviewCount: product.review_count,
     images,
     categories: product.categories,
-    attributes: product.attributes?.map((attribute) => ({
-      name: decodeHtml(attribute.name),
-      options: attribute.terms || attribute.options || [],
-      variation: attribute.variation,
-    })),
+    attributes,
     variations: product.variations,
   };
 }
@@ -232,7 +269,10 @@ async function getCategoryIdBySlug(slug: string) {
 
   if (!cleanSlug || /^\d+$/.test(cleanSlug)) return cleanSlug;
 
-  const response = await fetchWooStore<WooStoreCategory[]>("/wc/store/v1/products/categories");
+  const response = await fetchWooStore<WooStoreCategory[]>(
+    "/wc/store/v1/products/categories",
+  );
+
   const categoryIdBySlug: Record<string, string> = {};
 
   if (response.success && Array.isArray(response.data)) {
@@ -325,12 +365,10 @@ export async function getProductBySlug(
 ): Promise<ApiResponse<Product>> {
   const cleanSlug = decodeURIComponent(slug).trim();
 
-  const bySlugResponse = await getPublicWooProducts(
-    {
-      slug: cleanSlug,
-      per_page: "1",
-    },
-  );
+  const bySlugResponse = await getPublicWooProducts({
+    slug: cleanSlug,
+    per_page: "1",
+  });
 
   if (!bySlugResponse.success) {
     return {
@@ -351,12 +389,10 @@ export async function getProductBySlug(
     };
   }
 
-  const fallbackResponse = await getPublicWooProducts(
-    {
-      search: cleanSlug.replace(/-/g, " "),
-      per_page: "20",
-    },
-  );
+  const fallbackResponse = await getPublicWooProducts({
+    search: cleanSlug.replace(/-/g, " "),
+    per_page: "20",
+  });
 
   if (!fallbackResponse.success) {
     return {
@@ -428,6 +464,7 @@ export async function getPublicWooProducts(
   options?: { noStore?: boolean },
 ): Promise<ApiResponse<Product[]>> {
   const wooQuery = await mapWooQuery(query);
+
   const response = await fetchWooStore<WooStoreProduct[]>(
     "/wc/store/v1/products",
     wooQuery,

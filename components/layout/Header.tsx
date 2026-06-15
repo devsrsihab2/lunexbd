@@ -27,7 +27,16 @@ function Icon({
   name,
   className,
 }: {
-  name: "truck" | "support" | "search" | "user" | "heart" | "bag" | "chevron";
+  name:
+    | "truck"
+    | "support"
+    | "search"
+    | "user"
+    | "heart"
+    | "bag"
+    | "chevron"
+    | "home"
+    | "phone";
   className?: string;
 }) {
   const common = {
@@ -95,6 +104,24 @@ function Icon({
       <svg {...common}>
         <path d="M6 8h12l1 13H5L6 8Z" />
         <path d="M9 8a3 3 0 0 1 6 0" />
+      </svg>
+    );
+  }
+
+  if (name === "home") {
+    return (
+      <svg {...common}>
+        <path d="M3 11.2 12 4l9 7.2" />
+        <path d="M5.5 10.5V20h13v-9.5" />
+        <path d="M9.5 20v-5.5h5V20" />
+      </svg>
+    );
+  }
+
+  if (name === "phone") {
+    return (
+      <svg {...common}>
+        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.4 19.4 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.35 1.89.66 2.78a2 2 0 0 1-.45 2.11L8.05 9.88a16 16 0 0 0 6.07 6.07l1.27-1.27a2 2 0 0 1 2.11-.45c.89.31 1.82.53 2.78.66A2 2 0 0 1 22 16.92Z" />
       </svg>
     );
   }
@@ -201,6 +228,7 @@ export function Header({
 
   const cartCount =
     cart?.items?.reduce((total, item) => total + item.quantity, 0) || 0;
+
   const primaryMenu = menu.length ? menu : fallbackMenu;
 
   const { visibleMenu, overflowMenu } = useMemo(() => {
@@ -236,6 +264,10 @@ export function Header({
     "Help & Support";
 
   const supportHref = settings?.serviceBar?.supportHref || "/contact";
+  const callHref = settings?.contactPhone
+    ? `tel:${settings.contactPhone.replace(/\s+/g, "")}`
+    : "tel:+8801700000000";
+
   const logoIsLocal = settings?.logo?.startsWith("/");
 
   useEffect(() => {
@@ -436,6 +468,63 @@ export function Header({
 
         <SearchBox id="site-search" mobile icon={<Icon name="search" />} />
       </div>
+
+      <nav
+        className={styles.mobileBottomBar}
+        aria-label="Mobile bottom navigation"
+      >
+        <div
+          className={`${styles.mobileBottomItem} ${styles.mobileBottomMenu}`}
+        >
+          <MobileMenu menu={primaryMenu} />
+        </div>
+
+        <a className={styles.mobileBottomItem} href={callHref}>
+          <span className={styles.mobileBottomIcon}>
+            <Icon name="phone" />
+          </span>
+          <span>Call</span>
+        </a>
+
+        <Link
+          className={`${styles.mobileBottomHome} ${
+            isMenuActive(pathname, "/") ? styles.mobileBottomActive : ""
+          }`}
+          href="/"
+        >
+          <span className={styles.mobileHomeIcon}>
+            <Icon name="home" />
+          </span>
+          <span>Home</span>
+        </Link>
+
+        <Link
+          className={`${styles.mobileBottomItem} ${
+            isMenuActive(pathname, "/cart") ? styles.mobileBottomActive : ""
+          }`}
+          href="/cart"
+        >
+          <span className={styles.mobileBottomIcon}>
+            <Icon name="bag" />
+            {cartCount ? <b>{cartCount}</b> : null}
+          </span>
+          <span>Cart</span>
+        </Link>
+
+        <Link
+          className={`${styles.mobileBottomItem} ${
+            isMenuActive(pathname, isLoggedIn ? "/account" : "/login")
+              ? styles.mobileBottomActive
+              : ""
+          }`}
+          href={isLoggedIn ? "/account" : "/login"}
+        >
+          <span className={styles.mobileBottomIcon}>
+            <Icon name="user" />
+          </span>
+          <span>Profile</span>
+        </Link>
+      </nav>
     </header>
   );
 }

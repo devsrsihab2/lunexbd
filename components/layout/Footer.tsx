@@ -68,10 +68,6 @@ export function Footer({
               </>
             )}
           </Link>
-          <p className={styles.muted}>
-            {settings?.address ||
-              "Customer-first commerce powered by WordPress and WooCommerce."}
-          </p>
         </div>
         <div className={`${styles.footerGroup} ${styles.shopGroup}`}>
           <h3>Shop</h3>
@@ -102,7 +98,9 @@ export function Footer({
               </a>
             ) : null}
             {settings?.contactEmail ? (
-              <a href={`mailto:${settings.contactEmail}`}>{settings.contactEmail}</a>
+              <a href={`mailto:${settings.contactEmail}`}>
+                {settings.contactEmail}
+              </a>
             ) : (
               <span>Managed from WordPress settings</span>
             )}
@@ -123,10 +121,18 @@ export function Footer({
       </div>
       <div className={styles.bottomBar}>
         <p>All copyrights reserved lunex bd 2026</p>
-        <div className={styles.paymentBadges} aria-label="Supported payment methods">
+        <div
+          className={styles.paymentBadges}
+          aria-label="Supported payment methods"
+        >
           {paymentMethods.map((payment) => (
             <span key={payment.src}>
-              <Image src={payment.src} alt={payment.label} width={30} height={25} />
+              <Image
+                src={payment.src}
+                alt={payment.label}
+                width={30}
+                height={25}
+              />
             </span>
           ))}
         </div>

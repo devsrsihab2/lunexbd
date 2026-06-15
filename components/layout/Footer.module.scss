@@ -461,28 +461,70 @@ $surface: #071522;
 @media (max-width: 700px) {
   .inner {
     grid-template-areas:
-      "brand"
-      "shop"
-      "care"
-      "contact"
-      "subscribe";
-    grid-template-columns: 1fr;
-    gap: 1.7rem;
+      "brand brand"
+      "shop care"
+      "contact contact"
+      "subscribe subscribe";
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 1.65rem 1.25rem;
+    padding-block: 2.25rem 1.75rem;
   }
 
   .brandBlock {
-    max-width: 32rem;
+    max-width: none;
+  }
+
+  .muted {
+    max-width: 100%;
+    font-size: 0.88rem;
+  }
+
+  .footerGroup {
+    gap: 0.75rem;
+  }
+
+  .footerGroup h3 {
+    font-size: 0.78rem;
+  }
+
+  .links {
+    gap: 0.55rem;
+  }
+
+  .links a,
+  .contactList a,
+  .contactList span {
+    font-size: 0.86rem;
+    line-height: 1.35;
+  }
+
+  .contactList {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.55rem 0.8rem;
+  }
+
+  .socialLinks {
+    gap: 0.45rem;
+  }
+
+  .socialLinks a {
+    min-height: 1.9rem;
+    padding: 0.38rem 0.62rem;
+    font-size: 0.72rem;
   }
 
   .subscribe {
-    max-width: 34rem;
+    max-width: none;
   }
 }
 
 @media (max-width: 620px) {
   .bottomBar {
-    display: grid;
-    justify-items: start;
+    display: flex;
+    flex-direction: column;
+    justify-items: center;
+    align-items: center;
+    padding-bottom: calc(1.2rem + env(safe-area-inset-bottom));
   }
 
   .paymentBadges {
@@ -491,8 +533,13 @@ $surface: #071522;
 }
 
 @media (max-width: 460px) {
+  .footer {
+    margin-block-start: 2.8rem;
+  }
+
   .inner {
-    padding-block: 2.25rem;
+    gap: 1.45rem 1rem;
+    padding-block: 2rem 1.45rem;
   }
 
   .brand strong {
@@ -503,7 +550,25 @@ $surface: #071522;
     max-width: 10.5rem;
   }
 
+  .footerGroup h3 {
+    padding-bottom: 0.5rem;
+  }
+
+  .links a,
+  .contactList a,
+  .contactList span {
+    font-size: 0.82rem;
+  }
+
+  .contactList {
+    grid-template-columns: 1fr;
+  }
+
   .subscribe {
     padding: 0.95rem;
+  }
+
+  .bottomBar p {
+    font-size: 0.82rem;
   }
 }

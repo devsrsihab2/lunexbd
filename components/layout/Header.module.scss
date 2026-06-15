@@ -18,6 +18,7 @@
 
 .serviceInner {
   @include container;
+
   display: flex;
   min-height: 2.45rem;
   align-items: center;
@@ -78,6 +79,7 @@
 
 .inner {
   @include container;
+
   display: grid;
   grid-template-columns: auto 1fr auto;
   min-height: 5.75rem;
@@ -365,6 +367,7 @@
 
 .searchForm {
   position: relative;
+  z-index: 2;
   display: grid;
   width: 2.15rem;
   height: 2.15rem;
@@ -373,14 +376,16 @@
   border: 1px solid transparent;
   border-radius: 999px;
   background: transparent;
+  opacity: 1;
+  transform: none;
   transition:
-    width 220ms ease,
-    border-color 220ms ease,
-    background 220ms ease,
-    box-shadow 220ms ease;
+    opacity 160ms ease,
+    transform 180ms ease,
+    border-color 180ms ease,
+    background 180ms ease,
+    box-shadow 180ms ease;
 }
 
-.searchForm,
 .mobileSearch {
   z-index: 2;
 }
@@ -391,14 +396,18 @@
   height: 100%;
   border: 0;
   background: transparent;
-  padding: 0 0 0 0.9rem;
+  padding: 0 0 0 1.05rem;
   color: #111;
   font: inherit;
-  font-size: 0.86rem;
+  font-size: 0.96rem;
   opacity: 0;
   outline: 0;
   pointer-events: none;
-  transition: opacity 160ms ease;
+  transition: opacity 120ms ease;
+}
+
+.searchForm input::placeholder {
+  color: rgba(17, 17, 17, 0.56);
 }
 
 .searchForm button {
@@ -414,10 +423,20 @@
 }
 
 .searchOpen {
-  width: min(14rem, 18vw);
-  border-color: rgba(204, 135, 128, 0.28);
-  background: rgba(255, 255, 255, 0.8);
-  box-shadow: 0 10px 26px rgba(28, 20, 14, 0.1);
+  position: fixed;
+  top: 8.75rem;
+  left: 50%;
+  z-index: calc($z-header + 90);
+  width: min(31rem, calc(100vw - 2rem));
+  height: 3.85rem;
+  grid-template-columns: minmax(0, 1fr) 3.85rem;
+  border-color: rgba(204, 135, 128, 0.16);
+  border-radius: 7px;
+  background: #ffffff;
+  box-shadow:
+    0 22px 55px rgba(22, 18, 15, 0.18),
+    0 0 0 9999px rgba(0, 0, 0, 0.36);
+  transform: translateX(-50%);
 }
 
 .searchOpen input {
@@ -425,9 +444,15 @@
   pointer-events: auto;
 }
 
-.actions svg {
-  width: 1.45rem;
-  height: 1.45rem;
+.searchOpen button {
+  width: 3.85rem;
+  height: 3.85rem;
+  color: #1f2933;
+}
+
+.searchOpen button svg {
+  width: 1.35rem;
+  height: 1.35rem;
 }
 
 .cart span {
@@ -448,6 +473,7 @@
 }
 
 .menuButton {
+  position: relative;
   display: inline-grid;
   width: 2.5rem;
   height: 2.5rem;
@@ -455,6 +481,7 @@
   border: 0;
   background: transparent;
   color: #111;
+  cursor: pointer;
 
   @include lg {
     display: none;
@@ -465,11 +492,13 @@
   display: block;
   width: 1.55rem;
   height: 2px;
+  border-radius: 999px;
   background: currentColor;
 }
 
 .mobileSearch {
   @include container;
+
   position: relative;
   display: flex;
   padding-bottom: 0.9rem;
@@ -501,14 +530,16 @@
 
 .suggestions {
   position: absolute;
-  top: calc(100% + 0.55rem);
+  top: calc(100% + 0.65rem);
   right: 0;
-  z-index: calc($z-header + 30);
+  left: 0;
+  z-index: calc($z-header + 75);
   display: grid;
-  width: min(24rem, 88vw);
-  overflow: hidden;
+  width: 100%;
+  max-height: min(26rem, calc(100vh - 8rem));
+  overflow: auto;
   border: 1px solid rgba(204, 135, 128, 0.24);
-  border-radius: 8px;
+  border-radius: 12px;
   background: #fff;
   box-shadow: 0 22px 46px rgba(24, 16, 12, 0.18);
 }
@@ -594,6 +625,8 @@
   font-weight: 850;
 }
 
+/* Mobile drawer */
+
 .mobileLayer {
   position: fixed;
   inset: 0;
@@ -611,25 +644,27 @@
   position: absolute;
   inset: 0;
   border: 0;
-  background: rgba(0, 0, 0, 0.38);
+  background: rgba(0, 0, 0, 0.42);
   opacity: 0;
   transition: opacity 180ms ease;
+}
+
+.mobileLayerOpen .mobileScrim {
+  opacity: 1;
 }
 
 .mobilePanel {
   position: absolute;
   inset-block: 0;
   left: 0;
-  width: min(22rem, 86vw);
+  width: min(23.5rem, 88vw);
   overflow-y: auto;
-  background: #fbf3e8;
-  box-shadow: 18px 0 38px rgba(20, 15, 10, 0.25);
+  background:
+    radial-gradient(circle at 10% 0%, rgba(204, 135, 128, 0.13), transparent 32%),
+    linear-gradient(180deg, #fff7ef 0%, #fbefe5 100%);
+  box-shadow: 22px 0 48px rgba(20, 15, 10, 0.28);
   transform: translateX(-100%);
-  transition: transform 220ms ease;
-}
-
-.mobileLayerOpen .mobileScrim {
-  opacity: 1;
+  transition: transform 240ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .mobileLayerOpen .mobilePanel {
@@ -637,57 +672,241 @@
 }
 
 .mobileHead {
+  position: sticky;
+  top: 0;
+  z-index: 2;
   display: flex;
-  min-height: 5rem;
+  min-height: 5.25rem;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem 1.25rem;
-  border-bottom: 1px solid rgba(112, 76, 52, 0.16);
+  gap: 1rem;
+  padding: 1rem 1.1rem 0.95rem;
+  border-bottom: 1px solid rgba(112, 76, 52, 0.12);
+  background: rgba(255, 247, 239, 0.92);
+  backdrop-filter: blur(18px);
 }
 
-.mobileHead strong {
+.mobileBrand {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  color: #15110f;
+  text-decoration: none;
+}
+
+.mobileBrand span {
+  color: #1f2937;
   font-family: Georgia, "Times New Roman", serif;
-  font-size: 2rem;
-  font-weight: 400;
-  letter-spacing: 0.18em;
+  font-size: 1.65rem;
+  font-weight: 500;
+  letter-spacing: 0.32em;
+  line-height: 1;
   text-transform: uppercase;
 }
 
+.mobileLogoImage {
+  display: block;
+  width: auto;
+  max-width: 9.8rem;
+  height: auto;
+  max-height: 3.15rem;
+  object-fit: contain;
+}
+
 .mobileHead button {
-  width: 2.25rem;
-  height: 2.25rem;
-  border: 0;
-  background: transparent;
+  display: grid;
+  width: 2.55rem;
+  height: 2.55rem;
+  place-items: center;
+  border: 1px solid rgba(112, 76, 52, 0.13);
+  border-radius: 999px;
+  background: #fff;
   color: #111;
-  font-size: 2rem;
+  cursor: pointer;
+  font-size: 1.6rem;
+  font-weight: 900;
   line-height: 1;
+  box-shadow: 0 8px 18px rgba(25, 18, 12, 0.08);
+}
+
+.mobileIntro {
+  display: grid;
+  gap: 0.22rem;
+  margin: 1rem 1rem 0.65rem;
+  padding: 1rem;
+  border: 1px solid rgba(204, 135, 128, 0.16);
+  border-radius: 1rem;
+  background:
+    linear-gradient(135deg, rgba(204, 135, 128, 0.14), rgba(255, 255, 255, 0.7)),
+    #fffaf5;
+  box-shadow: 0 12px 28px rgba(25, 18, 12, 0.06);
+}
+
+.mobileIntro strong {
+  color: #1d1713;
+  font-size: 0.92rem;
+  font-weight: 950;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.mobileIntro span {
+  color: #755c4d;
+  font-size: 0.8rem;
+  font-weight: 650;
+  line-height: 1.45;
 }
 
 .mobileLinks {
   display: grid;
-  padding: 0.75rem;
+  gap: 0.58rem;
+  padding: 0.45rem 1rem 1.4rem;
 }
 
-.mobileLinks a {
-  display: flex;
-  min-height: 3rem;
+.mobileMenuGroup,
+.mobileSingleLink {
+  overflow: hidden;
+  border: 1px solid rgba(112, 76, 52, 0.11);
+  border-radius: 0.95rem;
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: 0 8px 22px rgba(25, 18, 12, 0.045);
+}
+
+.mobileSingleLink,
+.mobileParentButton {
+  display: grid;
+  width: 100%;
+  min-height: 3.7rem;
+  grid-template-columns: 2.35rem minmax(0, 1fr) auto;
   align-items: center;
-  border-bottom: 1px solid rgba(112, 76, 52, 0.12);
-  color: #17110d;
-  font-weight: 800;
+  gap: 0.72rem;
+  border: 0;
+  background: transparent;
+  color: #211713;
+  padding: 0.72rem 0.82rem;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
   text-decoration: none;
+}
+
+.mobileSingleLink:hover,
+.mobileParentButton:hover,
+.mobileActiveLink {
+  background: rgba(204, 135, 128, 0.1);
+}
+
+.mobileMenuIcon {
+  display: grid;
+  width: 2.35rem;
+  height: 2.35rem;
+  place-items: center;
+  border: 1px solid rgba(204, 135, 128, 0.18);
+  border-radius: 0.8rem;
+  background: #fff7ef;
+  color: #a85f58;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+}
+
+.mobileMenuText {
+  display: grid;
+  min-width: 0;
+  gap: 0.16rem;
+}
+
+.mobileMenuText strong {
+  overflow: hidden;
+  color: #2b1b15;
+  font-size: 0.86rem;
+  font-weight: 950;
+  line-height: 1.15;
+  text-overflow: ellipsis;
   text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.mobileMenuText small {
+  color: #8a6b5a;
+  font-size: 0.72rem;
+  font-weight: 750;
+  line-height: 1.1;
+}
+
+.mobileParentButton > svg {
+  color: #7d6255;
+  transition:
+    transform 220ms ease,
+    color 220ms ease;
+}
+
+.mobileChevronOpen {
+  color: #cc8780 !important;
+  transform: rotate(180deg);
 }
 
 .mobileSubLinks {
   display: grid;
-  padding-left: 1rem;
+  max-height: 0;
+  overflow: hidden;
+  padding: 0 0.82rem;
+  border-top: 1px solid transparent;
+  transition:
+    max-height 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    padding 220ms ease,
+    border-color 220ms ease;
+}
+
+.mobileMenuGroupOpen .mobileSubLinks {
+  max-height: 42rem;
+  padding: 0.2rem 0.82rem 0.82rem 3.9rem;
+  border-top-color: rgba(112, 76, 52, 0.1);
 }
 
 .mobileSubLinks a {
-  min-height: 2.35rem;
-  color: #6c4a39;
-  font-size: 0.86rem;
+  position: relative;
+  display: flex;
+  min-height: 2.45rem;
+  align-items: center;
+  border-bottom: 1px solid rgba(112, 76, 52, 0.08);
+  color: #5d4033;
+  font-size: 0.8rem;
+  font-weight: 850;
+  line-height: 1.25;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.mobileSubLinks a::before {
+  width: 0.38rem;
+  height: 0.38rem;
+  margin-right: 0.55rem;
+  border-radius: 999px;
+  background: rgba(204, 135, 128, 0.65);
+  content: "";
+}
+
+.mobileSubLinks a:last-child {
+  border-bottom: 0;
+}
+
+.mobileSubLinks a:hover,
+.mobileActiveSubLink {
+  color: #b46760 !important;
+}
+
+.mobileViewAll {
+  color: #cc8780 !important;
+  font-weight: 950 !important;
+}
+
+.mobileViewAll::before {
+  background: #cc8780 !important;
+}
+
+/* Mobile bottom app bar */
+
+.mobileBottomBar {
+  display: none;
 }
 
 @media (max-width: 74.99rem) {
@@ -714,59 +933,253 @@
 }
 
 @media (max-width: 47.99rem) {
-  .serviceInner {
-    justify-content: center;
+  :global(body) {
+    padding-bottom: calc(6.85rem + env(safe-area-inset-bottom));
   }
 
-  .serviceLeft {
-    width: 100%;
-    justify-content: space-between;
-    gap: 0.75rem;
+  .header {
+    position: relative;
+    top: auto;
+    z-index: $z-header;
+    background: transparent;
+    box-shadow: none;
   }
 
-  .serviceLeft i,
-  .serviceInner > a,
-  .dealLink {
+  .serviceBar,
+  .mainBar {
     display: none;
   }
 
-  .inner {
-    min-height: 5.25rem;
+  .mobileBottomBar {
+    position: fixed;
+    right: 0.85rem;
+    bottom: calc(0.85rem + env(safe-area-inset-bottom));
+    left: 0.85rem;
+    z-index: calc($z-header + 60);
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.22fr 1fr 1fr;
+    min-height: 4.95rem;
+    align-items: end;
+    overflow: visible;
+    border: 1px solid rgba(20, 20, 20, 0.08);
+    border-radius: 0.45rem;
+    background: rgba(255, 255, 255, 0.98);
+    padding: 0.68rem 0.42rem 0.55rem;
+    box-shadow:
+      0 18px 42px rgba(19, 13, 9, 0.18),
+      0 5px 14px rgba(19, 13, 9, 0.08);
   }
 
-  .brand {
-    gap: 0.45rem;
+  .mobileBottomItem,
+  .mobileBottomHome {
+    position: relative;
+    display: grid;
+    min-width: 0;
+    place-items: center;
+    gap: 0.28rem;
+    color: #4d555f;
+    font-size: 0.72rem;
+    font-weight: 850;
+    line-height: 1;
+    text-align: center;
+    text-decoration: none;
+    text-transform: uppercase;
   }
 
-  .mark {
+  .mobileBottomIcon {
+    position: relative;
+    display: grid;
+    width: 2.55rem;
+    height: 2.55rem;
+    place-items: center;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    border-radius: 999px;
+    background: #fff;
+    color: #424b57;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+  }
+
+  .mobileBottomIcon svg {
+    width: 1.28rem;
+    height: 1.28rem;
+  }
+
+  .mobileBottomIcon b {
+    position: absolute;
+    top: -0.2rem;
+    right: -0.18rem;
+    display: grid;
+    min-width: 1rem;
+    height: 1rem;
+    place-items: center;
+    border: 1px solid #fff;
+    border-radius: 999px;
+    background: #cc8780;
+    color: #fff;
+    font-size: 0.58rem;
+    font-weight: 900;
+  }
+
+  .mobileBottomHome {
+    align-self: center;
+    margin-top: -2.55rem;
+    color: #fff;
+    isolation: isolate;
+  }
+
+  .mobileBottomHome::before {
+    position: absolute;
+    inset: -0.35rem auto auto 50%;
+    z-index: -1;
+    width: 4.95rem;
+    height: 4.95rem;
+    border: 0.38rem solid #fff;
+    border-radius: 999px;
+    background: #cc8780;
+    box-shadow:
+      0 14px 26px rgba(204, 135, 128, 0.34),
+      0 6px 14px rgba(204, 135, 128, 0.22),
+      0 4px 10px rgba(0, 0, 0, 0.08);
+    content: "";
+    transform: translateX(-50%);
+  }
+
+  .mobileHomeIcon {
+    display: grid;
+    width: 2.25rem;
+    height: 2.15rem;
+    place-items: center;
+    color: #fff;
+  }
+
+  .mobileHomeIcon svg {
+    width: 1.6rem;
+    height: 1.6rem;
+    stroke-width: 2.15;
+  }
+
+  .mobileBottomHome > span:last-child {
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 900;
+  }
+
+  .mobileBottomActive {
+    color: #cc8780;
+  }
+
+  .mobileBottomActive .mobileBottomIcon {
+    border-color: rgba(204, 135, 128, 0.28);
+    color: #cc8780;
+  }
+
+  .mobileBottomMenu {
+    min-height: 3.35rem;
+  }
+
+  .mobileBottomMenu .menuButton {
+    display: grid;
+    width: 2.55rem;
+    height: 2.55rem;
+    margin: 0 auto;
+    place-items: center;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    border-radius: 999px;
+    background: #fff;
+    color: #424b57;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+  }
+
+  .mobileBottomMenu .menuButton::before,
+  .mobileBottomMenu .menuButton::after {
+    position: absolute;
+    left: 50%;
+    display: block;
+    width: 1.25rem;
+    height: 2px;
+    border-radius: 999px;
+    background: currentColor;
+    content: "";
+    transform: translateX(-50%);
+  }
+
+  .mobileBottomMenu .menuButton::before {
+    top: 0.82rem;
+  }
+
+  .mobileBottomMenu .menuButton::after {
+    top: 1.55rem;
+  }
+
+  .mobileBottomMenu .menuButton span {
+    width: 1.25rem;
+    height: 2px;
+    border-radius: 999px;
+    background: currentColor;
+  }
+
+  .mobileBottomMenu::after {
+    display: block;
+    margin-top: 0.28rem;
+    color: #4d555f;
+    font-size: 0.72rem;
+    font-weight: 850;
+    line-height: 1;
+    text-align: center;
+    text-transform: uppercase;
+    content: "Menu";
+  }
+
+  .mobileLayer {
+    z-index: calc($z-header + 80);
+  }
+
+  .mobilePanel {
+    padding-bottom: 2rem;
+  }
+
+  .mobileBottomMenu .mobileLayer {
+    z-index: calc($z-header + 90);
+  }
+}
+
+@media (max-width: 23rem) {
+  .mobileBottomBar {
+    right: 0.5rem;
+    left: 0.5rem;
+    min-height: 4.75rem;
+    padding-inline: 0.25rem;
+  }
+
+  .mobileBottomItem,
+  .mobileBottomHome {
+    font-size: 0.64rem;
+  }
+
+  .mobileBottomIcon,
+  .mobileBottomMenu .menuButton {
     width: 2.35rem;
-    height: 2.85rem;
-    font-size: 3.25rem;
+    height: 2.35rem;
   }
 
-  .wordmark strong {
-    font-size: 1.75rem;
-    letter-spacing: 0.19em;
+  .mobileBottomHome::before {
+    width: 4.55rem;
+    height: 4.55rem;
   }
 
-  .wordmark small {
-    font-size: 0.52rem;
-    letter-spacing: 0.23em;
+  .mobilePanel {
+    width: min(22rem, 91vw);
   }
 
-  .actions {
-    gap: 0.2rem;
+  .mobileIntro {
+    margin-inline: 0.75rem;
   }
 
-  .actions a {
-    width: 2.1rem;
+  .mobileLinks {
+    padding-inline: 0.75rem;
   }
 
-  .searchForm {
-    display: none;
-  }
-
-  .actions a:first-child {
-    display: none;
+  .mobileMenuText strong {
+    font-size: 0.8rem;
   }
 }
