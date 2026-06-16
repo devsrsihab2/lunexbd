@@ -410,7 +410,7 @@ export function AuthForm({ mode, redirectTo = "/account" }: Props) {
           </form>
         </div>
 
-        <div className={styles.divider}>
+        {/* <div className={styles.divider}>
           <span>{isRegister ? "or register with" : "or sign in with"}</span>
         </div>
 
@@ -431,7 +431,7 @@ export function AuthForm({ mode, redirectTo = "/account" }: Props) {
           >
             <FacebookIcon />
           </a>
-        </div>
+        </div> */}
 
         <p className={styles.switchText}>
           {isRegister ? "Already have an account?" : "Don't have any account?"}{" "}
