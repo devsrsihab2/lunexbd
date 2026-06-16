@@ -1,3 +1,4 @@
+
 @mixin container {
   width: 100%;
   max-width: 80%;
@@ -20,17 +21,31 @@
 
   @media (max-width: 575px) {
     max-width: 100%;
-    padding-left: 14px;
-    padding-right: 14px;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  @media (max-width: 380px) {
+    padding-left: 12px;
+    padding-right: 12px;
   }
 }
+
 .page {
   min-height: 70vh;
-  background: #f7f7f5;
+  background:
+    linear-gradient(180deg, rgba(204, 135, 128, 0.08), transparent 16rem),
+    #f8f5f4;
 }
 
 .inner {
   @include container;
   margin-inline: auto;
   padding-block: 1.5rem 3rem;
+}
+
+@media (max-width: 575px) {
+  .inner {
+    padding-block: 1rem 7.4rem;
+  }
 }

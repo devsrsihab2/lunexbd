@@ -41,6 +41,10 @@ $line: rgba(204, 135, 128, 0.24);
   box-shadow: 0 10px 24px rgba(64, 43, 41, 0.04);
 }
 
+.mobileFilterBar {
+  display: none;
+}
+
 .layout {
   display: grid;
   gap: 1.25rem;
@@ -49,7 +53,7 @@ $line: rgba(204, 135, 128, 0.24);
 .sidebar {
   min-width: 0;
   border: 1px solid $line;
-  border-radius: 8px;
+  border-radius: 16px;
   background: #fff;
   padding: 1.05rem;
   box-shadow: 0 14px 32px rgba(64, 43, 41, 0.06);
@@ -159,7 +163,12 @@ $line: rgba(204, 135, 128, 0.24);
   position: absolute;
   inset: 0;
   transform: translateX(-100%);
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.7), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.7),
+    transparent
+  );
   animation: shimmer 1.1s infinite;
   content: "";
 }
@@ -182,6 +191,94 @@ $line: rgba(204, 135, 128, 0.24);
   height: 2.35rem;
 }
 
+.mobileDrawerLayer {
+  position: fixed;
+  inset: 0;
+  z-index: 140;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.mobileDrawerBackdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(0, 0, 0, 0.52);
+  opacity: 0;
+  transition: opacity 180ms ease;
+}
+
+.mobileDrawer {
+  position: absolute;
+  inset-block: 0;
+  left: 0;
+  display: grid;
+  width: min(19.7rem, 78vw);
+  max-width: 100%;
+  grid-template-rows: auto minmax(0, 1fr);
+  background: #f3f4f7;
+  box-shadow: 18px 0 44px rgba(15, 23, 42, 0.22);
+  transform: translateX(-100%);
+  transition: transform 210ms ease;
+}
+
+.mobileDrawerOpen {
+  pointer-events: auto;
+  visibility: visible;
+}
+
+.mobileDrawerOpen .mobileDrawerBackdrop {
+  opacity: 1;
+}
+
+.mobileDrawerOpen .mobileDrawer {
+  transform: translateX(0);
+}
+
+.mobileDrawerHead {
+  display: grid;
+  min-height: 4.35rem;
+  grid-template-columns: 2.5rem minmax(0, 1fr) 2.5rem;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  background: #f3f4f7;
+}
+
+.mobileDrawerHead strong {
+  overflow: hidden;
+  color: $ink;
+  font-size: 0.9rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mobileDrawerMenuIcon,
+.mobileDrawerClose {
+  display: grid;
+  width: 2.35rem;
+  height: 2.35rem;
+  place-items: center;
+  border: 0;
+  background: transparent;
+  color: #1f2937;
+  cursor: pointer;
+}
+
+.mobileDrawerClose {
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.mobileDrawerBody {
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0.95rem;
+  overscroll-behavior: contain;
+}
+
 @keyframes shimmer {
   100% {
     transform: translateX(100%);
@@ -196,7 +293,7 @@ $line: rgba(204, 135, 128, 0.24);
 
 @media (min-width: 980px) {
   .layout {
-    grid-template-columns: minmax(220px, 260px) minmax(0, 1fr);
+    grid-template-columns: minmax(260px, 300px) minmax(0, 1fr);
     align-items: start;
   }
 
@@ -220,19 +317,106 @@ $line: rgba(204, 135, 128, 0.24);
 
 @media (min-width: 1500px) {
   .skeletonGrid {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 979px) {
+  .toolbar {
+    margin: 0.85rem 0 0.65rem;
+  }
+
+  .toolbar p,
+  .count {
+    display: none;
+  }
+
+  .mobileFilterBar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 0.85rem;
+    border: 1px solid rgba(204, 135, 128, 0.2);
+    border-radius: 8px;
+    background: #fff;
+    padding: 0.68rem;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.04);
+  }
+
+  .filterTrigger {
+    display: inline-flex;
+    min-height: 2.4rem;
+    align-items: center;
+    gap: 0.45rem;
+    border: 1px solid $brand;
+    border-radius: 5px;
+    background: #fff;
+    color: $brand;
+    cursor: pointer;
+    padding: 0 0.82rem;
+    font: inherit;
+    font-size: 0.8rem;
+    font-weight: 900;
+    text-transform: uppercase;
+  }
+
+  .filterTrigger svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .mobileCount {
+    color: $muted;
+    font-size: 0.78rem;
+    font-weight: 800;
+    text-align: right;
+  }
+
+  .layout {
+    display: block;
+  }
+
+  .sidebar {
+    display: none;
+  }
+
+  .resultBar {
+    display: none;
   }
 }
 
 @media (max-width: 720px) {
-  .toolbar,
-  .resultBar {
+  .toolbar {
     align-items: flex-start;
     flex-direction: column;
   }
 
-  .count {
-    width: 100%;
-    justify-content: center;
+  .toolbar h2 {
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 430px) {
+  .mobileDrawer {
+    width: min(18.2rem, 72vw);
+  }
+
+  .mobileDrawerBody {
+    padding: 0.75rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .mobileDrawer {
+    width: min(17rem, 78vw);
+  }
+
+  .mobileDrawerHead {
+    padding-inline: 0.75rem;
+  }
+
+  .mobileDrawerBody {
+    padding: 0.65rem;
   }
 }

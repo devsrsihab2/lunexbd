@@ -36,10 +36,39 @@ export type CheckoutOptions = {
 };
 
 export type CheckoutLineItem = {
+  key?: string;
   productId: number;
   variationId?: number;
   name: string;
   quantity: number;
   price: string;
+  total?: string;
   image?: string;
+  attributes?: Record<string, string>;
+};
+
+export type CheckoutCouponPayload = {
+  coupon: string;
+  items: CheckoutLineItem[];
+  shippingCost?: string;
+};
+
+export type CheckoutCouponResult = {
+  coupon: string;
+  discount: string;
+  subtotal: string;
+  shippingCost: string;
+  total: string;
+  message?: string;
+};
+
+export type CheckoutOrderPayload = {
+  item?: CheckoutLineItem;
+  items: CheckoutLineItem[];
+  paymentMethod: string;
+  shippingMethod: string;
+  coupon?: string;
+  notes?: FormDataEntryValue | null;
+  billing: Address;
+  shipping: Address;
 };

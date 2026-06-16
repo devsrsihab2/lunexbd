@@ -12,7 +12,6 @@
   gap: 14px;
 }
 
-/* Mobile large */
 @media (min-width: 576px) {
   .grid,
   .listing {
@@ -20,7 +19,6 @@
   }
 }
 
-/* Tablet */
 @media (min-width: 768px) {
   .grid,
   .listing {
@@ -28,7 +26,6 @@
   }
 }
 
-/* Laptop */
 @media (min-width: 992px) {
   .grid {
     grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -39,7 +36,6 @@
   }
 }
 
-/* Desktop */
 @media (min-width: 1200px) {
   .grid {
     grid-template-columns: repeat(6, minmax(0, 1fr));
@@ -52,6 +48,13 @@
 
 @media (min-width: 1500px) {
   .listing {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 430px) {
+  .grid,
+  .listing {
+    gap: 12px;
   }
 }

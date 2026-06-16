@@ -80,6 +80,11 @@ type AddCartItemInput = {
   variation?: Record<string, string>;
 };
 
+type StoreApiVariation = {
+  attribute: string;
+  value: string;
+};
+
 function toMajorUnit(value?: string | number | null, minorUnit = 2) {
   if (value === undefined || value === null || value === "") return "0";
 
@@ -98,6 +103,7 @@ function getWooItemImage(item: WooCartItem): ProductImage | undefined {
   return {
     id: image.id,
     src: image.src || image.thumbnail || "",
+    thumbnail: image.thumbnail || image.src || "",
     alt: image.alt || image.name || item.name,
   };
 }
@@ -160,6 +166,21 @@ function normalizeWooCart(cart: WooCart): Cart {
   };
 }
 
+function toStoreApiVariation(
+  variation?: Record<string, string>,
+): StoreApiVariation[] | undefined {
+  if (!variation || !Object.keys(variation).length) return undefined;
+
+  const values = Object.entries(variation)
+    .map(([attribute, value]) => ({
+      attribute,
+      value,
+    }))
+    .filter((item) => item.attribute && item.value);
+
+  return values.length ? values : undefined;
+}
+
 async function normalizeCartResponse(
   response: ApiResponse<WooCart>,
 ): Promise<ApiResponse<Cart>> {
@@ -187,16 +208,17 @@ export async function getCart() {
 export async function addCartItem({
   productId,
   quantity = 1,
-  variationId,
   variation,
 }: AddCartItemInput): Promise<ApiResponse<Cart>> {
+  const storeApiVariation = toStoreApiVariation(variation);
+
   return normalizeCartResponse(
     await apiFetch<WooCart>("/wc/store/v1/cart/add-item", {
       method: "POST",
       body: {
-        id: variationId || productId,
+        id: productId,
         quantity,
-        ...(variation ? { variation } : {}),
+        ...(storeApiVariation ? { variation: storeApiVariation } : {}),
       },
     }),
   );

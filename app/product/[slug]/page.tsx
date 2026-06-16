@@ -2,7 +2,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Badge } from "@/components/ui/Badge";
 import { ErrorState } from "@/components/ui/ErrorState";
-import { Price } from "@/components/ui/Price";
 import { ProductGallery } from "@/components/product/ProductGallery";
 import { ProductGrid } from "@/components/product/ProductGrid";
 import {
@@ -46,21 +45,6 @@ export async function generateStaticParams() {
   } while (page <= totalPages);
 
   return Array.from(slugs).map((slug) => ({ slug }));
-}
-
-function getDiscountPercent(price?: string, regularPrice?: string) {
-  const current = Number(price);
-  const regular = Number(regularPrice);
-
-  if (
-    !Number.isFinite(current) ||
-    !Number.isFinite(regular) ||
-    regular <= current
-  ) {
-    return null;
-  }
-
-  return Math.round(((regular - current) / regular) * 100);
 }
 
 function getReviewStats(reviews: { rating: number }[], fallbackRating: number) {
@@ -147,19 +131,25 @@ export default async function ProductDetailPage({
   }
 
   const product = productResponse.data;
+
   const [related, reviewsResponse] = await Promise.all([
     getRelatedProducts(product.id),
     getProductReviews(product.id),
   ]);
-  const discount = getDiscountPercent(product.price, product.regularPrice);
+
   const fallbackRating = Number(product.averageRating) || 0;
   const reviews = reviewsResponse.success ? reviewsResponse.data : [];
-  const reviewStats = getReviewStats(reviews, reviews.length ? fallbackRating : 0);
+  const reviewStats = getReviewStats(
+    reviews,
+    reviews.length ? fallbackRating : 0,
+  );
   const rating = reviewStats.average;
   const reviewCount = reviews.length;
   const firstCategory = product.categories?.[0];
   const reviewAction = submitProductReview.bind(null, product.id, product.slug);
-  const reviewLoginHref = `/login?redirect=${encodeURIComponent(`/product/${product.slug}#reviews`)}`;
+  const reviewLoginHref = `/login?redirect=${encodeURIComponent(
+    `/product/${product.slug}#reviews`,
+  )}`;
   const productUrl = `${getSiteUrl()}/product/${product.slug}`;
 
   return (
@@ -192,21 +182,7 @@ export default async function ProductDetailPage({
 
             <h1 className={styles.productTitle}>{product.name}</h1>
 
-            <div className={styles.priceRow}>
-              <span className={styles.price}>
-                <Price value={product.price} />
-              </span>
-
-              {product.regularPrice ? (
-                <span className={styles.regularPrice}>
-                  <Price value={product.regularPrice} />
-                </span>
-              ) : null}
-
-              {discount ? (
-                <span className={styles.save}>Save {discount}%</span>
-              ) : null}
-            </div>
+            <ProductPurchase product={product} />
 
             <div className={styles.ratingLine}>
               <span>{rating ? rating.toFixed(1) : "0.0"} average rating</span>
@@ -224,7 +200,6 @@ export default async function ProductDetailPage({
 
             <hr className={styles.divider} />
 
-            <ProductPurchase product={product} />
             <ProductWishlistAction product={product} />
 
             <div className={styles.quickActions}>
@@ -311,8 +286,7 @@ export default async function ProductDetailPage({
                         style={{
                           width: reviewStats.total
                             ? `${Math.round(
-                                (reviewStats.counts[star] /
-                                  reviewStats.total) *
+                                (reviewStats.counts[star] / reviewStats.total) *
                                   100,
                               )}%`
                             : "0%",
@@ -326,7 +300,10 @@ export default async function ProductDetailPage({
 
             <div className={styles.recommendation}>
               <strong>{reviewStats.counts[5] + reviewStats.counts[4]}</strong>
-              <span>Recommended ({reviewStats.counts[5] + reviewStats.counts[4]} of {reviewCount || 0})</span>
+              <span>
+                Recommended ({reviewStats.counts[5] + reviewStats.counts[4]} of{" "}
+                {reviewCount || 0})
+              </span>
             </div>
           </div>
 

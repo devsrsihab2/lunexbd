@@ -4,7 +4,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { getProducts } from "@/services/api/products.api";
 import type { ApiResponse } from "@/types/api.types";
-import type { Product, ProductQuery } from "@/types/product.types";
+import type {
+  Product,
+  ProductFilterOption,
+  ProductQuery,
+} from "@/types/product.types";
 import { ProductFilters } from "./ProductFilters";
 import { ProductGrid } from "./ProductGrid";
 import styles from "./ProductListing.module.scss";
@@ -14,6 +18,8 @@ const PRODUCTS_PER_PAGE = "8";
 type ProductListingProps = {
   initialProducts: ApiResponse<Product[]>;
   initialQuery: ProductQuery;
+  categoryOptions?: ProductFilterOption[];
+  brandOptions?: ProductFilterOption[];
 };
 
 function cleanQuery(query: ProductQuery) {
@@ -67,9 +73,50 @@ function normalizeProductResponse(
   return response;
 }
 
+function FilterIcon() {
+  return (
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.9"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M4 6h16" />
+      <path d="M7 12h10" />
+      <path d="M10 18h4" />
+    </svg>
+  );
+}
+
+function CloseIcon() {
+  return (
+    <svg
+      width="22"
+      height="22"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.9"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M18 6 6 18" />
+      <path d="m6 6 12 12" />
+    </svg>
+  );
+}
+
 export function ProductListing({
   initialProducts,
   initialQuery,
+  categoryOptions = [],
+  brandOptions = [],
 }: ProductListingProps) {
   const normalizedInitialProducts = useMemo(
     () => normalizeProductResponse(initialProducts),
@@ -80,6 +127,7 @@ export function ProductListing({
     () =>
       cleanQuery({
         category: initialQuery.category || "",
+        brand: initialQuery.brand || "",
         search: initialQuery.search || "",
         sort: initialQuery.sort || "latest",
         min_price: initialQuery.min_price || "",
@@ -110,6 +158,7 @@ export function ProductListing({
   const [loadingMode, setLoadingMode] = useState<"filter" | "more" | null>(
     null,
   );
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   const requestId = useRef(0);
   const hydrated = useRef(false);
@@ -177,13 +226,35 @@ export function ProductListing({
     return () => window.clearTimeout(timeout);
   }, [filters, loadProducts]);
 
+  useEffect(() => {
+    if (!isFilterOpen) return;
+
+    document.body.style.overflow = "hidden";
+
+    function handleEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setIsFilterOpen(false);
+      }
+    }
+
+    window.addEventListener("keydown", handleEscape);
+
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", handleEscape);
+    };
+  }, [isFilterOpen]);
+
   function handleFiltersChange(nextFilters: ProductQuery) {
     setFilters(cleanQuery(nextFilters));
   }
 
   function handleReset() {
     setFilters(
-      cleanQuery({ category: initialQuery.category || "", sort: "latest" }),
+      cleanQuery({
+        category: initialQuery.category || "",
+        sort: "latest",
+      }),
     );
   }
 
@@ -203,8 +274,8 @@ export function ProductListing({
                 : "All Products"}
           </h2>
           <p>
-            Filter by keyword, price and availability to find the right product
-            faster.
+            Filter by keyword, category, brand, price and availability to find
+            the right product faster.
           </p>
         </div>
 
@@ -213,10 +284,27 @@ export function ProductListing({
         </strong>
       </section>
 
+      <div className={styles.mobileFilterBar}>
+        <button
+          type="button"
+          className={styles.filterTrigger}
+          onClick={() => setIsFilterOpen(true)}
+        >
+          <FilterIcon />
+          <span>Filters</span>
+        </button>
+
+        <span className={styles.mobileCount}>
+          {message ? "Unavailable" : countLabel(totalProducts)}
+        </span>
+      </div>
+
       <div className={styles.layout}>
         <aside className={styles.sidebar}>
           <ProductFilters
             values={filters}
+            categories={categoryOptions}
+            brands={brandOptions}
             onChange={handleFiltersChange}
             onReset={handleReset}
           />
@@ -273,6 +361,54 @@ export function ProductListing({
             </>
           )}
         </section>
+      </div>
+
+      <div
+        className={`${styles.mobileDrawerLayer} ${
+          isFilterOpen ? styles.mobileDrawerOpen : ""
+        }`}
+        aria-hidden={!isFilterOpen}
+      >
+        <button
+          type="button"
+          className={styles.mobileDrawerBackdrop}
+          aria-label="Close filters"
+          onClick={() => setIsFilterOpen(false)}
+        />
+
+        <aside className={styles.mobileDrawer} aria-label="Product filters">
+          <div className={styles.mobileDrawerHead}>
+            <button
+              type="button"
+              className={styles.mobileDrawerMenuIcon}
+              aria-label="Filters"
+            >
+              <FilterIcon />
+            </button>
+
+            <strong>Filters</strong>
+
+            <button
+              type="button"
+              className={styles.mobileDrawerClose}
+              aria-label="Close filters"
+              onClick={() => setIsFilterOpen(false)}
+            >
+              <CloseIcon />
+            </button>
+          </div>
+
+          <div className={styles.mobileDrawerBody}>
+            <ProductFilters
+              values={filters}
+              categories={categoryOptions}
+              brands={brandOptions}
+              onChange={handleFiltersChange}
+              onReset={handleReset}
+              isDrawer
+            />
+          </div>
+        </aside>
       </div>
     </>
   );

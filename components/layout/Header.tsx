@@ -269,6 +269,7 @@ export function Header({
     : "tel:+8801700000000";
 
   const logoIsLocal = settings?.logo?.startsWith("/");
+  const logoAlt = settings?.siteName || "Lunexbd";
 
   useEffect(() => {
     function syncAuth() {
@@ -328,7 +329,7 @@ export function Header({
               <Image
                 className={styles.logoImage}
                 src={settings.logo}
-                alt={settings.siteName || "Lunexbd"}
+                alt={logoAlt}
                 width={230}
                 height={76}
                 priority
@@ -337,7 +338,7 @@ export function Header({
               <Image
                 className={styles.logoImage}
                 src={settings.logo}
-                alt={settings.siteName || "Lunexbd"}
+                alt={logoAlt}
                 width={230}
                 height={76}
                 unoptimized
@@ -467,6 +468,55 @@ export function Header({
         </div>
 
         <SearchBox id="site-search" mobile icon={<Icon name="search" />} />
+      </div>
+
+      <div className={styles.mobileTopBar}>
+        <div className={styles.mobileTopInner}>
+          <Link className={styles.mobileTopBrand} href="/">
+            {settings?.logo && logoIsLocal ? (
+              <Image
+                className={styles.mobileTopLogoImage}
+                src={settings.logo}
+                alt={logoAlt}
+                width={190}
+                height={64}
+                priority
+              />
+            ) : settings?.logo ? (
+              <Image
+                className={styles.mobileTopLogoImage}
+                src={settings.logo}
+                alt={logoAlt}
+                width={190}
+                height={64}
+                unoptimized
+                priority
+              />
+            ) : (
+              <>
+                <span className={styles.mark}>L</span>
+                <span className={styles.wordmark}>
+                  <strong>Lunex</strong>
+                  <small>All Bags. Every You.</small>
+                </span>
+              </>
+            )}
+          </Link>
+
+          <nav
+            className={styles.mobileTopActions}
+            aria-label="Mobile shortcuts"
+          >
+            <SearchBox
+              id="mobile-top-site-search"
+              icon={<Icon name="search" />}
+            />
+
+            <Link href="/wishlist" aria-label="Wishlist">
+              <Icon name="heart" />
+            </Link>
+          </nav>
+        </div>
       </div>
 
       <nav

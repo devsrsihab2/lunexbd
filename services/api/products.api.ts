@@ -1,4 +1,10 @@
-import type { Product, ProductQuery } from "@/types/product.types";
+import type {
+  Product,
+  ProductFilterOption,
+  ProductQuery,
+  ProductSwatchAttribute,
+  ProductVariation,
+} from "@/types/product.types";
 import type { ApiResponse } from "@/types/api.types";
 
 const wpApiUrl = process.env.NEXT_PUBLIC_WP_API_URL;
@@ -20,16 +26,6 @@ type WooStoreAttributeTerm =
       slug?: string;
     };
 
-type WooStoreProductAttribute = {
-  id?: number;
-  name: string;
-  taxonomy?: string;
-  terms?: WooStoreAttributeTerm[];
-  options?: WooStoreAttributeTerm[];
-  variation?: boolean;
-  has_variations?: boolean;
-};
-
 type WooStoreProduct = {
   id: number;
   slug: string;
@@ -42,7 +38,13 @@ type WooStoreProduct = {
   review_count?: number;
   images?: WooStoreImage[];
   categories?: { id: number; name: string; slug: string }[];
-  attributes?: WooStoreProductAttribute[];
+  attributes?: {
+    name: string;
+    terms?: WooStoreAttributeTerm[];
+    options?: WooStoreAttributeTerm[];
+    variation?: boolean;
+    has_variations?: boolean;
+  }[];
   variations?: Product["variations"];
   prices?: {
     price?: string;
@@ -56,7 +58,9 @@ type WooStoreProduct = {
 
 type WooStoreCategory = {
   id: number;
+  name?: string;
   slug: string;
+  count?: number;
 };
 
 function decodeHtml(value?: string) {
@@ -75,6 +79,14 @@ function decodeHtml(value?: string) {
     .replace(/<[^>]*>/g, "")
     .replace(/\s+/g, " ")
     .trim();
+}
+
+function toSlug(value: string) {
+  return decodeHtml(value)
+    .toLowerCase()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
 }
 
 function appendQuery(url: string, query?: Record<string, QueryValue>) {
@@ -227,20 +239,6 @@ function mapWooProduct(product: WooStoreProduct): Product {
     ];
   });
 
-  const attributes = (product.attributes || [])
-    .map((attribute) => {
-      const options = normalizeAttributeOptions(
-        attribute.terms || attribute.options || [],
-      );
-
-      return {
-        name: decodeHtml(attribute.name),
-        options,
-        variation: Boolean(attribute.variation || attribute.has_variations),
-      };
-    })
-    .filter((attribute) => attribute.name && attribute.options.length);
-
   return {
     id: product.id,
     slug: product.slug,
@@ -259,8 +257,67 @@ function mapWooProduct(product: WooStoreProduct): Product {
     reviewCount: product.review_count,
     images,
     categories: product.categories,
-    attributes,
+    attributes: product.attributes
+      ?.map((attribute) => ({
+        name: decodeHtml(attribute.name),
+        options: normalizeAttributeOptions(
+          attribute.terms || attribute.options || [],
+        ),
+        variation: Boolean(attribute.variation || attribute.has_variations),
+      }))
+      .filter((attribute) => attribute.name && attribute.options.length),
     variations: product.variations,
+  };
+}
+
+async function getProductSwatches(
+  productId: number,
+): Promise<ProductSwatchAttribute[]> {
+  const response = await fetchWooStore<{
+    success: boolean;
+    data: ProductSwatchAttribute[];
+    message?: string;
+  }>(`/lunex/v1/products/${productId}/swatches`);
+
+  if (!response.success || !response.data?.success) {
+    return [];
+  }
+
+  return Array.isArray(response.data.data) ? response.data.data : [];
+}
+
+async function getProductVariations(
+  productId: number,
+): Promise<ProductVariation[]> {
+  const response = await fetchWooStore<{
+    success: boolean;
+    data: ProductVariation[];
+    message?: string;
+  }>(`/lunex/v1/products/${productId}/variations`);
+
+  if (!response.success || !response.data?.success) {
+    return [];
+  }
+
+  return Array.isArray(response.data.data) ? response.data.data : [];
+}
+
+async function attachVariableProductData(product: Product): Promise<Product> {
+  if (product.type !== "variable") {
+    return product;
+  }
+
+  const [swatches, detailedVariations] = await Promise.all([
+    getProductSwatches(product.id),
+    getProductVariations(product.id),
+  ]);
+
+  return {
+    ...product,
+    swatches,
+    variations: detailedVariations.length
+      ? detailedVariations
+      : product.variations,
   };
 }
 
@@ -271,6 +328,7 @@ async function getCategoryIdBySlug(slug: string) {
 
   const response = await fetchWooStore<WooStoreCategory[]>(
     "/wc/store/v1/products/categories",
+    { per_page: 100 },
   );
 
   const categoryIdBySlug: Record<string, string> = {};
@@ -285,7 +343,8 @@ async function getCategoryIdBySlug(slug: string) {
 }
 
 async function mapWooQuery(query: ProductQuery = {}): Promise<ProductQuery> {
-  const { sort, page, min_price, max_price, stock_status, ...rest } = query;
+  const { sort, page, min_price, max_price, stock_status, brand, ...rest } =
+    query;
 
   const nextQuery: ProductQuery = {
     ...rest,
@@ -324,6 +383,13 @@ async function mapWooQuery(query: ProductQuery = {}): Promise<ProductQuery> {
     nextQuery.category = await getCategoryIdBySlug(query.category);
   }
 
+  if (brand) {
+    nextQuery.brand = brand;
+    nextQuery["attributes[0][attribute]"] = "pa_brand";
+    nextQuery["attributes[0][slug]"] = brand;
+    nextQuery.attribute_relation = "and";
+  }
+
   return nextQuery;
 }
 
@@ -360,6 +426,87 @@ export async function getProducts(query: ProductQuery = {}) {
   return response;
 }
 
+export async function getProductCategories(): Promise<
+  ApiResponse<ProductFilterOption[]>
+> {
+  const response = await fetchWooStore<WooStoreCategory[]>(
+    "/wc/store/v1/products/categories",
+    {
+      per_page: 100,
+    },
+  );
+
+  if (!response.success) {
+    return {
+      ...response,
+      data: [],
+    };
+  }
+
+  return {
+    success: true,
+    data: (response.data || [])
+      .filter((category) => category.slug && category.name)
+      .map((category) => ({
+        id: category.id,
+        name: decodeHtml(category.name),
+        slug: category.slug,
+        count: category.count,
+      })),
+    message: "Success",
+  };
+}
+
+export async function getProductBrands(): Promise<
+  ApiResponse<ProductFilterOption[]>
+> {
+  const response = await getPublicWooProducts({
+    per_page: "100",
+    sort: "latest",
+  });
+
+  if (!response.success) {
+    return {
+      success: false,
+      data: [],
+      message: response.message || "Unable to load product brands.",
+    };
+  }
+
+  const brandMap = new Map<string, ProductFilterOption>();
+
+  response.data.forEach((product) => {
+    product.attributes?.forEach((attribute) => {
+      const attributeName = attribute.name.toLowerCase();
+
+      if (!attributeName.includes("brand")) return;
+
+      attribute.options.forEach((option) => {
+        const name = decodeHtml(option);
+        const slug = toSlug(name);
+
+        if (!name || !slug) return;
+
+        const current = brandMap.get(slug);
+
+        brandMap.set(slug, {
+          name,
+          slug,
+          count: (current?.count || 0) + 1,
+        });
+      });
+    });
+  });
+
+  return {
+    success: true,
+    data: Array.from(brandMap.values()).sort((a, b) =>
+      a.name.localeCompare(b.name),
+    ),
+    message: "Success",
+  };
+}
+
 export async function getProductBySlug(
   slug: string,
 ): Promise<ApiResponse<Product>> {
@@ -384,7 +531,7 @@ export async function getProductBySlug(
   if (directProduct) {
     return {
       success: true,
-      data: directProduct,
+      data: await attachVariableProductData(directProduct),
       message: "Success",
     };
   }
@@ -415,7 +562,7 @@ export async function getProductBySlug(
 
   return {
     success: true,
-    data: fallbackProduct,
+    data: await attachVariableProductData(fallbackProduct),
     message: "Success",
   };
 }
@@ -448,13 +595,13 @@ export async function getProductById(
     return {
       success: false,
       data: null as unknown as Product,
-      message: "Product not found",
+      message: "Product not found.",
     };
   }
 
   return {
     success: true,
-    data: product,
+    data: await attachVariableProductData(product),
     message: "Success",
   };
 }

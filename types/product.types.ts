@@ -11,6 +11,32 @@ export type ProductAttribute = {
   variation?: boolean;
 };
 
+export type ProductSwatchType =
+  | "select"
+  | "color"
+  | "image"
+  | "button"
+  | "radio";
+
+export type ProductSwatchTerm = {
+  id?: number | null;
+  name: string;
+  slug: string;
+  type: ProductSwatchType;
+  color?: string;
+  image?: string;
+  taxonomy?: string;
+  attribute?: string;
+};
+
+export type ProductSwatchAttribute = {
+  name: string;
+  slug: string;
+  taxonomy?: string;
+  type: ProductSwatchType;
+  terms: ProductSwatchTerm[];
+};
+
 export type ProductVariation = {
   id: number;
   price: string;
@@ -21,6 +47,12 @@ export type ProductVariation = {
   image?: ProductImage;
 };
 
+export type ProductFilterOption = {
+  id?: number | string;
+  name: string;
+  slug: string;
+  count?: number;
+};
 export type Product = {
   id: number;
   slug: string;
@@ -39,6 +71,13 @@ export type Product = {
   categories?: { id: number; name: string; slug: string }[];
   attributes?: ProductAttribute[];
   variations?: ProductVariation[];
+
+  /**
+   * Headless Woo Variation Swatches data.
+   * Comes from:
+   * /wp-json/lunex/v1/products/{id}/swatches
+   */
+  swatches?: ProductSwatchAttribute[];
 };
 
 export type ProductReview = {
@@ -56,6 +95,7 @@ export type ProductQuery = {
   page?: string;
   search?: string;
   category?: string;
+  brand?: string;
   sort?: string;
   min_price?: string;
   max_price?: string;

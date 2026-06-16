@@ -12,13 +12,14 @@
 
   position: relative;
   display: grid;
-  min-height: clamp(18rem, 30vw, 24rem);
+  min-height: clamp(24rem, 42vw, 34rem);
   overflow: hidden;
 
   background: linear-gradient(90deg, #fff8ee 0%, #fbf1e4 39%, #ead9c7 100%);
 
   @include lg {
-    grid-template-columns: minmax(25rem, 42%) 1fr;
+    grid-template-columns: minmax(27rem, 42%) 1fr;
+    min-height: clamp(31rem, 48vw, 42rem);
   }
 }
 
@@ -148,7 +149,7 @@
 
 .art {
   position: relative;
-  min-height: 18rem;
+  min-height: clamp(24rem, 40vw, 35rem);
   overflow: hidden;
 }
 
@@ -405,7 +406,12 @@
   }
 
   .art {
-    min-height: clamp(16rem, 45vw, 22rem);
+    order: 1;
+    min-height: clamp(21rem, 56vw, 31rem);
+  }
+
+  .copy {
+    order: 2;
   }
 
   .slider {
@@ -414,9 +420,9 @@
 
   .copy {
     gap: 0.85rem;
-    padding-top: clamp(1.5rem, 4vw, 2.2rem);
+    padding-top: clamp(1.6rem, 4vw, 2.4rem);
     padding-right: 1rem;
-    padding-bottom: clamp(1.5rem, 4vw, 2.2rem);
+    padding-bottom: clamp(1.8rem, 4.5vw, 2.8rem);
     padding-left: 0;
   }
 
@@ -445,12 +451,12 @@
 
   .hero {
     padding-inline: 1rem;
-    background: linear-gradient(180deg, #fff8ee 0%, #fbf1e4 48%, #ead9c7 100%);
+    background: linear-gradient(180deg, #ead9c7 0%, #fbf1e4 44%, #fff8ee 100%);
   }
 
   .copy {
     gap: 0.75rem;
-    padding: 1.35rem 0 1.15rem;
+    padding: 1.45rem 0 1.55rem;
   }
 
   .script {
@@ -489,8 +495,8 @@
   }
 
   .art {
-    min-height: 0;
-    aspect-ratio: 1.48 / 1;
+    min-height: clamp(18rem, 74vw, 25rem);
+    aspect-ratio: 1.18 / 1;
     margin-inline: -1rem;
   }
 

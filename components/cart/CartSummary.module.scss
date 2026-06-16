@@ -1,4 +1,12 @@
+
 @use "@/styles/abstracts/variables" as *;
+
+$brand: #cc8780;
+$brand-deep: #9d625d;
+$ink: #111827;
+$muted: #667085;
+$line: rgba(204, 135, 128, 0.22);
+$soft: #fff8f6;
 
 .cartPage {
   display: grid;
@@ -12,7 +20,7 @@
   justify-items: center;
   gap: 0.7rem;
   border: 1px solid #e2d8cf;
-  border-radius: 8px;
+  border-radius: 14px;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(252, 247, 246, 0.96)),
     radial-gradient(circle at 50% 0%, rgba(204, 135, 128, 0.16), transparent 40%);
@@ -29,11 +37,11 @@
   border: 1px solid rgba(204, 135, 128, 0.24);
   border-radius: 999px;
   background: #fff;
-  color: #cc8780;
+  color: $brand;
 }
 
 .emptyCart span {
-  color: #cc8780;
+  color: $brand;
   font-size: 0.78rem;
   font-weight: 900;
   text-transform: uppercase;
@@ -59,8 +67,8 @@
   min-height: 2.9rem;
   place-items: center;
   margin-top: 0.45rem;
-  border-radius: 4px;
-  background: #cc8780;
+  border-radius: 7px;
+  background: $brand;
   color: #fff;
   font-weight: 900;
   text-decoration: none;
@@ -73,31 +81,32 @@
   justify-content: space-between;
   gap: 1rem;
   padding-bottom: 0.85rem;
-  border-bottom: 1px solid #dedede;
+  border-bottom: 1px solid rgba(17, 24, 39, 0.1);
 }
 
 .heading h1 {
   margin: 0;
-  color: #111;
+  color: $ink;
   font-size: clamp(1.35rem, 3vw, 2rem);
+  line-height: 1.12;
 }
 
 .heading p {
   margin: 0.25rem 0 0;
-  color: #667085;
+  color: $muted;
 }
 
 .heading a {
-  color: #cc8780;
+  color: $brand;
   font-size: 0.86rem;
-  font-weight: 800;
+  font-weight: 850;
   text-decoration: none;
   text-transform: uppercase;
 }
 
 .layout {
   display: grid;
-  gap: 1rem;
+  gap: 1.05rem;
 }
 
 @media (min-width: 980px) {
@@ -109,23 +118,24 @@
 
 .items {
   display: grid;
-  gap: 0.8rem;
+  gap: 0.85rem;
 }
 
 .item,
 .summary {
   border: 1px solid #e6ded8;
-  border-radius: 8px;
+  border-radius: 12px;
   background: #fff;
   box-shadow: 0 12px 30px rgba(16, 24, 40, 0.05);
 }
 
 .item {
+  position: relative;
   display: grid;
-  grid-template-columns: 5rem minmax(0, 1fr);
+  grid-template-columns: 5.3rem minmax(0, 1fr);
   gap: 0.8rem;
   align-items: center;
-  padding: 0.75rem;
+  padding: 0.78rem;
 }
 
 @media (min-width: 720px) {
@@ -136,10 +146,11 @@
 
 .imageBox {
   position: relative;
+  display: block;
   aspect-ratio: 1;
   overflow: hidden;
   border: 1px solid #e7ded8;
-  border-radius: 7px;
+  border-radius: 10px;
   background: #fffaf7;
 }
 
@@ -148,7 +159,7 @@
   width: 100%;
   height: 100%;
   object-fit: contain;
-  padding: 0.28rem;
+  padding: 0.32rem;
 }
 
 .imageFallback {
@@ -157,7 +168,7 @@
   height: 100%;
   place-items: center;
   background: linear-gradient(135deg, #fff7f4, #f4faf7);
-  color: #cc8780;
+  color: $brand;
   font-size: 1.35rem;
   font-weight: 900;
   text-transform: uppercase;
@@ -168,49 +179,66 @@
 }
 
 .itemInfo h2 {
+  display: -webkit-box;
+  max-height: 2.7rem;
   margin: 0;
   overflow: hidden;
-  color: #111;
+  color: $ink;
   font-size: 0.98rem;
+  font-weight: 850;
+  line-height: 1.35;
   text-overflow: ellipsis;
-  white-space: nowrap;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .itemInfo p {
-  margin: 0.25rem 0;
-  color: #667085;
+  display: -webkit-box;
+  max-height: 2.05rem;
+  margin: 0.28rem 0;
+  overflow: hidden;
+  color: $muted;
   font-size: 0.78rem;
+  line-height: 1.35;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .itemInfo strong,
 .total {
-  color: #cc8780;
+  color: $brand;
+  font-weight: 900;
 }
 
 .quantity {
   display: grid;
   grid-template-columns: 2.1rem 1fr 2.1rem;
   overflow: hidden;
-  border: 1px solid #cc8780;
-  border-radius: 4px;
+  border: 1px solid rgba(204, 135, 128, 0.65);
+  border-radius: 7px;
+  background: #fff;
 }
 
 .quantity button {
-  min-height: 2rem;
+  min-height: 2.1rem;
   border: 0;
-  background: #cc8780;
+  background: $brand;
   color: #fff;
   font-weight: 900;
+  cursor: pointer;
 }
 
 .quantity button:disabled {
+  cursor: wait;
   opacity: 0.55;
 }
 
 .quantity span {
   display: grid;
+  min-width: 2.3rem;
   place-items: center;
-  font-weight: 800;
+  color: $ink;
+  font-weight: 850;
 }
 
 .total {
@@ -225,6 +253,12 @@
   background: #fff3f3;
   color: #b42318;
   font-weight: 900;
+  cursor: pointer;
+}
+
+.remove:disabled {
+  cursor: wait;
+  opacity: 0.55;
 }
 
 .summary {
@@ -237,36 +271,52 @@
 
 .summary h2 {
   margin: 0;
-  border-left: 3px solid #cc8780;
-  padding-left: 0.5rem;
+  border-left: 3px solid $brand;
+  padding-left: 0.55rem;
+  color: $ink;
   font-size: 1.05rem;
+  line-height: 1.2;
 }
 
 .coupon {
   display: grid;
   gap: 0.45rem;
   color: #344054;
-  font-weight: 700;
+  font-weight: 750;
 }
 
 .coupon div {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: 0.4rem;
 }
 
 .coupon input,
 .coupon button {
-  min-height: 2.35rem;
-  border: 1px solid #cc8780;
-  border-radius: 4px;
-  padding-inline: 0.7rem;
+  min-height: 2.42rem;
+  border: 1px solid rgba(204, 135, 128, 0.55);
+  border-radius: 7px;
+  padding-inline: 0.72rem;
+  font: inherit;
+}
+
+.coupon input {
+  min-width: 0;
+  background: $soft;
+  color: $ink;
+  outline: 0;
+}
+
+.coupon input:focus {
+  border-color: $brand;
+  box-shadow: 0 0 0 3px rgba(204, 135, 128, 0.16);
 }
 
 .coupon button {
-  background: #cc8780;
+  background: $brand;
   color: #fff;
-  font-weight: 800;
+  font-weight: 850;
+  cursor: pointer;
 }
 
 .summary dl {
@@ -282,13 +332,14 @@
 }
 
 .summary dt {
-  color: #667085;
+  color: $muted;
 }
 
 .summary dd {
   margin: 0;
   color: #0b2b25;
-  font-weight: 800;
+  font-weight: 850;
+  text-align: right;
 }
 
 .grand {
@@ -296,20 +347,191 @@
   padding-top: 0.85rem;
 }
 
+.grand dt,
+.grand dd {
+  color: $ink;
+  font-size: 1.04rem;
+  font-weight: 900;
+}
+
 .checkout {
   display: grid;
-  min-height: 2.65rem;
+  min-height: 2.75rem;
   place-items: center;
-  border-radius: 5px;
-  background: #cc8780;
+  border-radius: 8px;
+  background: $brand;
   color: #fff;
   font-weight: 900;
+  letter-spacing: 0.01em;
   text-decoration: none;
   text-transform: uppercase;
+  box-shadow: 0 12px 24px rgba(204, 135, 128, 0.2);
 }
 
 .error {
   margin: 0;
   color: #b42318;
-  font-weight: 700;
+  font-weight: 750;
+}
+
+@media (max-width: 719px) {
+  .heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.55rem;
+  }
+
+  .heading a {
+    display: inline-flex;
+    min-height: 2.35rem;
+    align-items: center;
+    border: 1px solid rgba(204, 135, 128, 0.28);
+    border-radius: 999px;
+    background: #fff;
+    padding: 0 0.85rem;
+    font-size: 0.76rem;
+  }
+
+  .item {
+    grid-template-columns: 5.2rem minmax(0, 1fr);
+    gap: 0.75rem;
+    padding: 0.72rem;
+  }
+
+  .quantity {
+    grid-column: 2;
+    width: min(100%, 9.4rem);
+    margin-top: 0.1rem;
+  }
+
+  .total {
+    grid-column: 2;
+    justify-self: start;
+    margin-top: -0.15rem;
+    font-size: 0.92rem;
+  }
+
+  .remove {
+    position: absolute;
+    top: 0.58rem;
+    right: 0.58rem;
+    width: 1.85rem;
+    height: 1.85rem;
+    box-shadow: 0 6px 14px rgba(180, 35, 24, 0.1);
+  }
+
+  .summary {
+    position: static;
+    padding: 0.95rem;
+  }
+}
+
+@media (max-width: 575px) {
+  .cartPage {
+    gap: 1rem;
+  }
+
+  .heading h1 {
+    font-size: 1.45rem;
+  }
+
+  .heading p {
+    font-size: 0.88rem;
+  }
+
+  .item,
+  .summary {
+    border-radius: 13px;
+  }
+
+  .item {
+    grid-template-columns: 5rem minmax(0, 1fr);
+    padding: 0.68rem;
+  }
+
+  .imageBox {
+    border-radius: 10px;
+  }
+
+  .itemInfo {
+    padding-right: 1.7rem;
+  }
+
+  .itemInfo h2 {
+    max-height: 2.45rem;
+    font-size: 0.9rem;
+    line-height: 1.32;
+  }
+
+  .itemInfo p {
+    max-height: 1.9rem;
+    font-size: 0.72rem;
+  }
+
+  .itemInfo strong {
+    font-size: 0.88rem;
+  }
+
+  .quantity {
+    width: min(100%, 8.6rem);
+    grid-template-columns: 2rem 1fr 2rem;
+  }
+
+  .quantity button,
+  .quantity span {
+    min-height: 2rem;
+  }
+
+  .coupon div {
+    grid-template-columns: 1fr;
+  }
+
+  .coupon button {
+    width: 100%;
+  }
+
+  .summary dl {
+    gap: 0.68rem;
+  }
+
+  .summary dt,
+  .summary dd {
+    font-size: 0.9rem;
+  }
+
+  .grand dt,
+  .grand dd {
+    font-size: 1rem;
+  }
+
+  .checkout {
+    min-height: 2.7rem;
+    font-size: 0.84rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .item {
+    grid-template-columns: 4.55rem minmax(0, 1fr);
+    gap: 0.62rem;
+    padding: 0.6rem;
+  }
+
+  .itemInfo h2 {
+    font-size: 0.84rem;
+  }
+
+  .itemInfo p {
+    font-size: 0.68rem;
+  }
+
+  .quantity {
+    width: min(100%, 8rem);
+    grid-template-columns: 1.85rem 1fr 1.85rem;
+  }
+
+  .remove {
+    top: 0.45rem;
+    right: 0.45rem;
+  }
 }
