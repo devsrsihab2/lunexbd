@@ -1535,3 +1535,39 @@
     max-height: min(13rem, calc(100dvh - 6rem));
   }
 }
+/* Mobile search suggestion "View all" button fix */
+@media (max-width: 47.99rem) {
+  .mobileTopActions .searchOpen .viewResults {
+    display: flex !important;
+    width: 100% !important;
+    min-width: 100% !important;
+    height: 3rem !important;
+    min-height: 3rem !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border: 0 !important;
+    border-top: 1px solid rgba(204, 135, 128, 0.16) !important;
+    border-radius: 0 0 10px 10px !important;
+    background: #111 !important;
+    color: #fff !important;
+    padding: 0 1rem !important;
+    font-size: 0.86rem !important;
+    font-weight: 850 !important;
+    line-height: 1 !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+    word-break: keep-all !important;
+  }
+
+  .mobileTopActions .searchOpen .viewResults::first-letter {
+    text-transform: uppercase;
+  }
+}
+
+@media (max-width: 360px) {
+  .mobileTopActions .searchOpen .viewResults {
+    font-size: 0.8rem !important;
+    height: 2.85rem !important;
+    min-height: 2.85rem !important;
+  }
+}
