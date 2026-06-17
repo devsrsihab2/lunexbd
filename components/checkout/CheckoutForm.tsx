@@ -659,7 +659,7 @@ export function CheckoutForm({
             )}
           </section>
 
-          <section className={styles.panel}>
+          {/* <section className={styles.panel}>
             <h2>Shipping method</h2>
 
             {!hasShippingMethods || (selectedDivision && !selectedShipping) ? (
@@ -676,7 +676,7 @@ export function CheckoutForm({
                 Select a district to see the delivery method.
               </p>
             )}
-          </section>
+          </section> */}
 
           <section className={styles.panel}>
             <h2>Have any coupon or gift voucher?</h2>
