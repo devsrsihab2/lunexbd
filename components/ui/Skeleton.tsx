@@ -9,35 +9,39 @@ export function Skeleton({ lines = 3, variant = "default" }: SkeletonProps) {
   if (variant === "page") {
     return (
       <section className={styles.pageSkeleton} aria-hidden="true">
-        <div className={styles.loadingHeader}>
-          <span className={styles.logoSkeleton} />
-          <div className={styles.headerActions}>
+        <div className={styles.skeletonTopbar}>
+          <span className={styles.skeletonLogo} />
+          <div className={styles.skeletonNav}>
+            <span />
             <span />
             <span />
             <span />
           </div>
         </div>
 
-        <div className={styles.loadingInner}>
-          <div className={styles.heroSkeleton}>
-            <span />
-            <span />
-            <span />
-            <span />
+        <div className={styles.skeletonContainer}>
+          <div className={styles.skeletonHero}>
+            <div className={styles.skeletonHeroText}>
+              <span />
+              <span />
+              <span />
+              <span />
+            </div>
+
+            <div className={styles.skeletonHeroImage} />
           </div>
 
-          <div className={styles.contentSkeleton}>
-            <aside className={styles.filterSkeleton}>
-              <span />
+          <div className={styles.skeletonContent}>
+            <aside className={styles.skeletonSidebar}>
               <span />
               <span />
               <span />
               <span />
             </aside>
 
-            <div className={styles.gridSkeleton}>
+            <div className={styles.skeletonGrid}>
               {Array.from({ length: 8 }).map((_, index) => (
-                <article key={index} className={styles.productSkeleton}>
+                <article className={styles.skeletonCard} key={index}>
                   <span />
                   <span />
                   <span />

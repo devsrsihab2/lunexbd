@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { useCart } from "@/hooks/useCart";
 import type { MenuItem, SiteSettings } from "@/types/content.types";
@@ -10,7 +10,8 @@ import { MobileMenu } from "./MobileMenu";
 import { SearchBox } from "./SearchBox";
 import styles from "./Header.module.scss";
 
-const DESKTOP_VISIBLE_MENU_LIMIT = 8;
+const DESKTOP_VISIBLE_MENU_LIMIT = 12;
+const MEGA_MENU_CLOSE_DELAY = 220;
 
 const fallbackMenu: MenuItem[] = [
   { label: "Home", href: "/" },
@@ -36,7 +37,8 @@ function Icon({
     | "bag"
     | "chevron"
     | "home"
-    | "phone";
+    | "phone"
+    | "menu";
   className?: string;
 }) {
   const common = {
@@ -126,6 +128,16 @@ function Icon({
     );
   }
 
+  if (name === "menu") {
+    return (
+      <svg {...common}>
+        <path d="M4 7h16" />
+        <path d="M4 12h12" />
+        <path d="M4 17h16" />
+      </svg>
+    );
+  }
+
   return (
     <svg
       width="12"
@@ -162,18 +174,14 @@ function normalizeCategoryHref(href: string) {
   const cleanPath = path.replace(/\/+$/, "");
   const categoryPrefix = "/category/";
 
-  if (!cleanPath.startsWith(categoryPrefix)) {
-    return href;
-  }
+  if (!cleanPath.startsWith(categoryPrefix)) return href;
 
   const parts = cleanPath
     .replace(categoryPrefix, "")
     .split("/")
     .filter(Boolean);
 
-  if (!parts.length) {
-    return href;
-  }
+  if (!parts.length) return href;
 
   const lastSlug = parts[parts.length - 1];
   let normalizedHref = `${categoryPrefix}${lastSlug}`;
@@ -191,31 +199,96 @@ function isMenuActive(pathname: string | null, href: string) {
   return Boolean(pathname?.startsWith(hrefPath));
 }
 
-function DesktopDropdownLinks({
-  items,
-  parentKey,
-}: {
-  items: MenuItem[];
-  parentKey: string;
-}) {
-  return (
-    <div className={styles.dropdown}>
-      {items.map((child, childIndex) => {
-        const childHref = normalizeCategoryHref(child.href);
+function splitIntoThreeColumns<T>(items: T[]) {
+  const columns: T[][] = [[], [], []];
 
-        return (
-          <Link key={menuKey(child, childIndex, parentKey)} href={childHref}>
-            {child.label}
+  items.forEach((item, index) => {
+    const columnIndex = Math.floor(index / 8);
+
+    if (columnIndex < 3) {
+      columns[columnIndex].push(item);
+      return;
+    }
+
+    columns[index % 3].push(item);
+  });
+
+  return columns;
+}
+
+function DesktopMegaMenu({
+  item,
+  parentKey,
+  onClose,
+}: {
+  item: MenuItem;
+  parentKey: string;
+  onClose: () => void;
+}) {
+  const children = item.children || [];
+  const parentHref = normalizeCategoryHref(item.href);
+  const columns = splitIntoThreeColumns(children);
+
+  return (
+    <div className={styles.megaMenu}>
+      <div className={styles.megaMenuInner}>
+        <div className={styles.megaMenuTop}>
+          <div>
+            <strong>{item.label}</strong>
+            <span>Browse all available categories</span>
+          </div>
+
+          <Link href={parentHref} onClick={onClose}>
+            View all
           </Link>
-        );
-      })}
+        </div>
+
+        <div className={styles.megaMenuGrid}>
+          {columns.map((column, columnIndex) => (
+            <div
+              className={styles.megaMenuColumn}
+              key={`${parentKey}-column-${columnIndex}`}
+            >
+              {column.length ? (
+                column.map((child, childIndex) => {
+                  const childHref = normalizeCategoryHref(child.href);
+
+                  return (
+                    <Link
+                      key={menuKey(
+                        child,
+                        childIndex,
+                        `${parentKey}-${columnIndex}`,
+                      )}
+                      href={childHref}
+                      onClick={onClose}
+                    >
+                      <span>{child.label}</span>
+                    </Link>
+                  );
+                })
+              ) : (
+                <span className={styles.megaMenuEmpty}>
+                </span>
+              )}
+            </div>
+          ))}
+        </div>
+
+        <Link
+          className={styles.megaMenuShowAll}
+          href={parentHref}
+          onClick={onClose}
+        >
+          Show All
+        </Link>
+      </div>
     </div>
   );
 }
 
 export function Header({
   menu = fallbackMenu,
-  topMenu = [],
   settings,
 }: {
   menu?: MenuItem[];
@@ -225,6 +298,9 @@ export function Header({
   const pathname = usePathname();
   const { cart } = useCart();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [activeMegaMenu, setActiveMegaMenu] = useState<string | null>(null);
+  const [closingMegaMenu, setClosingMegaMenu] = useState<string | null>(null);
+  const closeTimerRef = useRef<number | null>(null);
 
   const cartCount =
     cart?.items?.reduce((total, item) => total + item.quantity, 0) || 0;
@@ -238,38 +314,48 @@ export function Header({
     };
   }, [primaryMenu]);
 
-  const dealLink =
-    settings?.deals?.href ||
-    settings?.topBanner?.href ||
-    topMenu[0]?.href ||
-    "/products";
+  const logoIsLocal = settings?.logo?.startsWith("/");
+  const logoAlt = settings?.siteName || "Lunexbd";
 
-  const dealLabel =
-    settings?.deals?.label ||
-    settings?.topBanner?.badge ||
-    topMenu[0]?.label ||
-    "Deals";
-
-  const deliveryText =
-    settings?.serviceBar?.deliveryText || "Free Delivery on all orders";
-  const deliveryHref = settings?.serviceBar?.deliveryHref || "/products";
-
-  const returnsText =
-    settings?.serviceBar?.returnsText || "Easy Returns within 7 days";
-  const returnsHref = settings?.serviceBar?.returnsHref || "/terms-conditions";
-
-  const supportText =
-    settings?.contactPhone ||
-    settings?.serviceBar?.supportText ||
-    "Help & Support";
-
-  const supportHref = settings?.serviceBar?.supportHref || "/contact";
   const callHref = settings?.contactPhone
     ? `tel:${settings.contactPhone.replace(/\s+/g, "")}`
     : "tel:+8801700000000";
 
-  const logoIsLocal = settings?.logo?.startsWith("/");
-  const logoAlt = settings?.siteName || "Lunexbd";
+  function clearMegaCloseTimer() {
+    if (closeTimerRef.current) {
+      window.clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+  }
+
+  function openMegaMenu(itemKey: string) {
+    clearMegaCloseTimer();
+    setClosingMegaMenu(null);
+    setActiveMegaMenu(itemKey);
+  }
+
+  function closeMegaMenu() {
+    if (!activeMegaMenu) return;
+
+    const currentMenu = activeMegaMenu;
+
+    clearMegaCloseTimer();
+    setActiveMegaMenu(null);
+    setClosingMegaMenu(currentMenu);
+
+    closeTimerRef.current = window.setTimeout(() => {
+      setClosingMegaMenu((previousMenu) =>
+        previousMenu === currentMenu ? null : previousMenu,
+      );
+      closeTimerRef.current = null;
+    }, MEGA_MENU_CLOSE_DELAY);
+  }
+
+  function closeMegaMenuInstantly() {
+    clearMegaCloseTimer();
+    setActiveMegaMenu(null);
+    setClosingMegaMenu(null);
+  }
 
   useEffect(() => {
     function syncAuth() {
@@ -292,93 +378,151 @@ export function Header({
     };
   }, []);
 
+  useEffect(() => {
+    closeMegaMenuInstantly();
+  }, [pathname]);
+
+  useEffect(() => {
+    return () => clearMegaCloseTimer();
+  }, []);
+
   return (
     <header className={styles.header}>
-      <div className={styles.serviceBar}>
-        <div className={styles.serviceInner}>
-          <div className={styles.serviceLeft}>
-            <Link href={deliveryHref}>
-              <Icon name="truck" /> <strong>{deliveryText}</strong>
+      <div className={styles.desktopHeader}>
+        <div className={styles.desktopMain}>
+          <div className={styles.desktopInner}>
+            <Link className={styles.brand} href="/">
+              {settings?.logo && logoIsLocal ? (
+                <Image
+                  className={styles.logoImage}
+                  src={settings.logo}
+                  alt={logoAlt}
+                  width={230}
+                  height={76}
+                  priority
+                />
+              ) : settings?.logo ? (
+                <Image
+                  className={styles.logoImage}
+                  src={settings.logo}
+                  alt={logoAlt}
+                  width={230}
+                  height={76}
+                  unoptimized
+                  priority
+                />
+              ) : (
+                <>
+                  <span className={styles.mark}>L</span>
+                  <span className={styles.wordmark}>
+                    <strong>Lunex</strong>
+                    <small>All Bags. Every You.</small>
+                  </span>
+                </>
+              )}
             </Link>
 
-            <i aria-hidden="true" />
-
-            <Link href={returnsHref}>
-              <strong>{returnsText}</strong>
-            </Link>
-
-            <i aria-hidden="true" />
-
-            <Link className={styles.dealLink} href={dealLink}>
-              <strong>{dealLabel}</strong>
-            </Link>
-          </div>
-
-          <Link href={supportHref}>
-            <Icon name="support" /> {supportText}
-          </Link>
-        </div>
-      </div>
-
-      <div className={styles.mainBar}>
-        <div className={styles.inner}>
-          <MobileMenu menu={primaryMenu} />
-
-          <Link className={styles.brand} href="/">
-            {settings?.logo && logoIsLocal ? (
-              <Image
-                className={styles.logoImage}
-                src={settings.logo}
-                alt={logoAlt}
-                width={230}
-                height={76}
-                priority
+            <div className={styles.desktopSearchWrap}>
+              <SearchBox
+                id="desktop-site-search"
+                icon={<Icon name="search" />}
+                alwaysOpen
               />
-            ) : settings?.logo ? (
-              <Image
-                className={styles.logoImage}
-                src={settings.logo}
-                alt={logoAlt}
-                width={230}
-                height={76}
-                unoptimized
-                priority
-              />
-            ) : (
-              <>
-                <span className={styles.mark}>L</span>
-                <span className={styles.wordmark}>
-                  <strong>Lunex</strong>
-                  <small>All Bags. Every You.</small>
+            </div>
+
+            <nav className={styles.desktopActions} aria-label="Shop shortcuts">
+              <Link className={styles.desktopAction} href="/order-tracking">
+                <span className={styles.desktopActionIcon}>
+                  <Icon name="truck" />
                 </span>
-              </>
-            )}
-          </Link>
+                <span>Track Order</span>
+              </Link>
 
-          <nav className={styles.nav} aria-label="Main navigation">
+              <Link
+                className={styles.desktopAction}
+                href={isLoggedIn ? "/account" : "/login"}
+              >
+                <span className={styles.desktopActionIcon}>
+                  <Icon name="user" />
+                </span>
+                <span>{isLoggedIn ? "Account" : "Sign In"}</span>
+              </Link>
+
+              <Link className={styles.desktopAction} href="/wishlist">
+                <span className={styles.desktopActionIcon}>
+                  <Icon name="heart" />
+                </span>
+                <span>Wishlist</span>
+              </Link>
+
+              <Link
+                className={`${styles.desktopAction} ${styles.desktopCart}`}
+                href="/cart"
+                aria-label={`Cart${cartCount ? `, ${cartCount} items` : ""}`}
+              >
+                <span className={styles.desktopActionIcon}>
+                  <Icon name="bag" />
+                  {cartCount ? <b>{cartCount}</b> : null}
+                </span>
+                <span>Cart</span>
+              </Link>
+            </nav>
+          </div>
+        </div>
+
+        <div className={styles.desktopNavBar}>
+          <nav
+            className={styles.desktopNavInner}
+            aria-label="Main navigation"
+            onMouseLeave={closeMegaMenu}
+          >
             {visibleMenu.map((item, index) => {
               const normalizedHref = normalizeCategoryHref(item.href);
               const isActive = isMenuActive(pathname, normalizedHref);
+              const itemKey = menuKey(item, index, "header");
+              const hasChildren = Boolean(item.children?.length);
+              const isMegaOpen = activeMegaMenu === itemKey;
+              const isMegaClosing = closingMegaMenu === itemKey;
+              const shouldRenderMega = hasChildren && (isMegaOpen || isMegaClosing);
 
               return (
                 <div
-                  key={menuKey(item, index, "header")}
-                  className={styles.navItem}
+                  key={itemKey}
+                  className={`${styles.navItem} ${
+                    isMegaOpen ? styles.navItemMegaOpen : ""
+                  } ${isMegaClosing ? styles.navItemMegaClosing : ""}`}
+                  onMouseEnter={() => {
+                    if (hasChildren) {
+                      openMegaMenu(itemKey);
+                      return;
+                    }
+
+                    closeMegaMenu();
+                  }}
+                  onFocus={() => {
+                    if (hasChildren) {
+                      openMegaMenu(itemKey);
+                      return;
+                    }
+
+                    closeMegaMenu();
+                  }}
                 >
                   <Link
                     className={isActive ? styles.active : undefined}
                     href={normalizedHref}
                   >
                     <span>{item.label}</span>
-                    {item.children?.length ? (
+                    {hasChildren ? (
                       <Icon name="chevron" className={styles.chevronIcon} />
                     ) : null}
                   </Link>
 
-                  {item.children?.length ? (
-                    <DesktopDropdownLinks
-                      items={item.children}
+                  {shouldRenderMega ? (
+                    <DesktopMegaMenu
+                      item={item}
                       parentKey={`header-${index}`}
+                      onClose={closeMegaMenuInstantly}
                     />
                   ) : null}
                 </div>
@@ -441,37 +585,15 @@ export function Header({
               </div>
             ) : null}
           </nav>
-
-          <nav className={styles.actions} aria-label="Shop shortcuts">
-            <SearchBox id="desktop-site-search" icon={<Icon name="search" />} />
-
-            <Link href="/wishlist" aria-label="Wishlist">
-              <Icon name="heart" />
-            </Link>
-
-            <Link
-              href={isLoggedIn ? "/account" : "/login"}
-              aria-label={isLoggedIn ? "Account" : "Login"}
-            >
-              <Icon name="user" />
-            </Link>
-
-            <Link
-              className={styles.cart}
-              href="/cart"
-              aria-label={`Cart${cartCount ? `, ${cartCount} items` : ""}`}
-            >
-              <Icon name="bag" />
-              {cartCount ? <span>{cartCount}</span> : null}
-            </Link>
-          </nav>
         </div>
-
-        <SearchBox id="site-search" mobile icon={<Icon name="search" />} />
       </div>
 
       <div className={styles.mobileTopBar}>
         <div className={styles.mobileTopInner}>
+          <div className={styles.mobileTopMenuButton}>
+            <MobileMenu menu={primaryMenu} />
+          </div>
+
           <Link className={styles.mobileTopBrand} href="/">
             {settings?.logo && logoIsLocal ? (
               <Image
@@ -512,8 +634,13 @@ export function Header({
               icon={<Icon name="search" />}
             />
 
-            <Link href="/wishlist" aria-label="Wishlist">
-              <Icon name="heart" />
+            <Link
+              className={styles.mobileTopCart}
+              href="/cart"
+              aria-label={`Cart${cartCount ? `, ${cartCount} items` : ""}`}
+            >
+              <Icon name="bag" />
+              {cartCount ? <span>{cartCount}</span> : null}
             </Link>
           </nav>
         </div>
@@ -523,11 +650,17 @@ export function Header({
         className={styles.mobileBottomBar}
         aria-label="Mobile bottom navigation"
       >
-        <div
-          className={`${styles.mobileBottomItem} ${styles.mobileBottomMenu}`}
+        <Link
+          className={`${styles.mobileBottomItem} ${
+            isMenuActive(pathname, "/products") ? styles.mobileBottomActive : ""
+          }`}
+          href="/products"
         >
-          <MobileMenu menu={primaryMenu} />
-        </div>
+          <span className={styles.mobileBottomIcon}>
+            <Icon name="menu" />
+          </span>
+          <span>Shop</span>
+        </Link>
 
         <a className={styles.mobileBottomItem} href={callHref}>
           <span className={styles.mobileBottomIcon}>
@@ -550,15 +683,14 @@ export function Header({
 
         <Link
           className={`${styles.mobileBottomItem} ${
-            isMenuActive(pathname, "/cart") ? styles.mobileBottomActive : ""
+            isMenuActive(pathname, "/wishlist") ? styles.mobileBottomActive : ""
           }`}
-          href="/cart"
+          href="/wishlist"
         >
           <span className={styles.mobileBottomIcon}>
-            <Icon name="bag" />
-            {cartCount ? <b>{cartCount}</b> : null}
+            <Icon name="heart" />
           </span>
-          <span>Cart</span>
+          <span>Wishlist</span>
         </Link>
 
         <Link

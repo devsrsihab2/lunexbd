@@ -361,7 +361,7 @@ $muted: #655f5c;
 
 .quantityControl {
   display: inline-grid;
-  grid-template-columns: 36px 52px 36px;
+  grid-template-columns: 38px 52px 38px;
   width: max-content;
   height: 38px;
   overflow: hidden;
@@ -371,30 +371,66 @@ $muted: #655f5c;
 
   button,
   input {
+    min-width: 0;
+    height: 100%;
     border: 0;
     background: transparent;
     color: $primary-dark;
     text-align: center;
     font-size: 14px;
     font-weight: 800;
+    line-height: 1;
   }
 
   button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
     cursor: pointer;
+    font-size: 0;
+    line-height: 1;
     transition:
       background 0.2s ease,
       color 0.2s ease;
+
+    &::before {
+      display: inline-block;
+      color: currentColor;
+      font-size: 18px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    &:first-child::before {
+      content: "−";
+    }
+
+    &:last-child::before {
+      content: "+";
+    }
 
     &:hover {
       background: rgba($primary, 0.12);
       color: $primary-dark;
     }
+
+    &:focus-visible {
+      outline: 2px solid rgba($primary, 0.28);
+      outline-offset: -2px;
+    }
   }
 
   input {
+    display: block;
     width: 52px;
+    padding: 0;
     appearance: textfield;
     outline: none;
+    color: $primary-dark;
+    font-size: 14px;
+    font-weight: 850;
+    line-height: 38px;
 
     &::-webkit-outer-spin-button,
     &::-webkit-inner-spin-button {

@@ -12,17 +12,48 @@ type SearchBoxProps = {
   id: string;
   mobile?: boolean;
   icon: React.ReactNode;
+  alwaysOpen?: boolean;
 };
 
-export function SearchBox({ id, mobile = false, icon }: SearchBoxProps) {
+function CloseIcon() {
+  return (
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M6 6l12 12M18 6 6 18"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+export function SearchBox({
+  id,
+  mobile = false,
+  icon,
+  alwaysOpen = false,
+}: SearchBoxProps) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [closing, setClosing] = useState(false);
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
+
   const formRef = useRef<HTMLFormElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const requestId = useRef(0);
+  const closeTimerRef = useRef<number | null>(null);
+
+  const panelVisible = alwaysOpen || open || closing;
+  const activeOpen = alwaysOpen || open;
 
   const resetSearchState = useCallback(() => {
     requestId.current += 1;
@@ -32,17 +63,51 @@ export function SearchBox({ id, mobile = false, icon }: SearchBoxProps) {
   }, []);
 
   const closeSearch = useCallback(() => {
+    if (alwaysOpen) {
+      resetSearchState();
+      return;
+    }
+
+    if (!open && !closing) return;
+
     setOpen(false);
-    resetSearchState();
-  }, [resetSearchState]);
+    setClosing(true);
+
+    if (closeTimerRef.current) {
+      window.clearTimeout(closeTimerRef.current);
+    }
+
+    closeTimerRef.current = window.setTimeout(() => {
+      setClosing(false);
+      resetSearchState();
+      closeTimerRef.current = null;
+    }, 220);
+  }, [alwaysOpen, closing, open, resetSearchState]);
 
   const openSearch = useCallback(() => {
+    if (closeTimerRef.current) {
+      window.clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+
+    setClosing(false);
     setOpen(true);
-    window.requestAnimationFrame(() => inputRef.current?.focus());
+
+    window.requestAnimationFrame(() => {
+      inputRef.current?.focus();
+    });
   }, []);
 
   useEffect(() => {
-    if (!open) return;
+    return () => {
+      if (closeTimerRef.current) {
+        window.clearTimeout(closeTimerRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!panelVisible) return;
 
     function handlePointerDown(event: PointerEvent) {
       const target = event.target;
@@ -66,7 +131,7 @@ export function SearchBox({ id, mobile = false, icon }: SearchBoxProps) {
       document.removeEventListener("pointerdown", handlePointerDown);
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [closeSearch, open]);
+  }, [closeSearch, panelVisible]);
 
   useEffect(() => {
     const search = query.trim();
@@ -108,13 +173,13 @@ export function SearchBox({ id, mobile = false, icon }: SearchBoxProps) {
 
     const search = query.trim();
 
-    if (!open) {
+    if (!activeOpen) {
       openSearch();
       return;
     }
 
     if (!search) {
-      openSearch();
+      inputRef.current?.focus();
       return;
     }
 
@@ -126,10 +191,27 @@ export function SearchBox({ id, mobile = false, icon }: SearchBoxProps) {
     <form
       ref={formRef}
       className={`${mobile ? styles.mobileSearch : styles.searchForm} ${
-        open ? styles.searchOpen : ""
+        alwaysOpen ? styles.searchDocked : ""
+      } ${open ? styles.searchOpen : ""} ${
+        closing ? styles.searchClosing : ""
       }`}
       onSubmit={submitSearch}
     >
+      {!alwaysOpen && panelVisible ? (
+        <div className={styles.mobileSearchHead}>
+          <strong>Search Products</strong>
+
+          <button
+            className={styles.mobileSearchClose}
+            type="button"
+            aria-label="Close search"
+            onClick={closeSearch}
+          >
+            <CloseIcon />
+          </button>
+        </div>
+      ) : null}
+
       <label className="sr-only" htmlFor={id}>
         Search products
       </label>
@@ -140,27 +222,26 @@ export function SearchBox({ id, mobile = false, icon }: SearchBoxProps) {
         name="search"
         type="search"
         placeholder={
-          mobile ? "Search bags, wallets and accessories" : "Search products"
+          mobile ? "Search bags, wallets and accessories" : "Search in..."
         }
-        tabIndex={open ? 0 : -1}
+        tabIndex={activeOpen ? 0 : -1}
         value={query}
         onChange={(event) => setQuery(event.target.value)}
         autoComplete="off"
       />
 
       <button
+        className={styles.searchSubmitButton}
         type="submit"
-        aria-label={open ? "Search products" : "Open search"}
+        aria-label={activeOpen ? "Search products" : "Open search"}
         onClick={() => {
-          if (!open) {
-            openSearch();
-          }
+          if (!activeOpen) openSearch();
         }}
       >
         {icon}
       </button>
 
-      {open && query.trim().length >= 2 ? (
+      {panelVisible && query.trim().length >= 2 ? (
         <div
           className={styles.suggestions}
           role="listbox"
