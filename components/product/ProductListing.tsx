@@ -38,6 +38,31 @@ function countLabel(count: number) {
   return `${count} ${count === 1 ? "product" : "products"}`;
 }
 
+function formatFilterLabel(value?: string) {
+  if (!value) return "";
+
+  return value
+    .replaceAll("-", " ")
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function getResultLabel(filters: ProductQuery) {
+  const activeLabels = [
+    filters.category ? `Category: ${formatFilterLabel(filters.category)}` : "",
+    filters.brand ? `Brand: ${formatFilterLabel(filters.brand)}` : "",
+  ].filter(Boolean);
+
+  if (filters.search) {
+    return `Search: ${filters.search}`;
+  }
+
+  if (activeLabels.length) {
+    return activeLabels.join(" / ");
+  }
+
+  return "All products";
+}
+
 function isEmptyProductResponse(response: ApiResponse<Product[]>) {
   const message = response.message?.toLowerCase() || "";
 
@@ -312,13 +337,7 @@ export function ProductListing({
 
         <section className={styles.content}>
           <div className={styles.resultBar}>
-            <span>
-              {filters.search
-                ? `Search: ${filters.search}`
-                : filters.category
-                  ? `Category: ${filters.category.replaceAll("-", " ")}`
-                  : "All products"}
-            </span>
+            <span>{getResultLabel(filters)}</span>
 
             <span>
               {filters.sort

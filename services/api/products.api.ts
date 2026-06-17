@@ -9,6 +9,8 @@ import type { ApiResponse } from "@/types/api.types";
 
 const wpApiUrl = process.env.NEXT_PUBLIC_WP_API_URL;
 
+const BRAND_ATTRIBUTE_TAXONOMY = "pa_brand";
+
 type QueryValue = string | number | boolean | null | undefined;
 
 type WooStoreImage = {
@@ -58,6 +60,20 @@ type WooStoreProduct = {
 
 type WooStoreCategory = {
   id: number;
+  name?: string;
+  slug: string;
+  count?: number;
+};
+
+type WooStoreProductAttribute = {
+  id: number;
+  name?: string;
+  slug?: string;
+  taxonomy?: string;
+};
+
+type WooStoreProductAttributeTerm = {
+  id?: number;
   name?: string;
   slug: string;
   count?: number;
@@ -384,10 +400,10 @@ async function mapWooQuery(query: ProductQuery = {}): Promise<ProductQuery> {
   }
 
   if (brand) {
+    // WooCommerce Brands uses the `product_brand` taxonomy in wp-admin.
+    // The Store API accepts the public `brand` query when WooCommerce Brands is enabled.
+    // Do not use `pa_brand` here because your brands are not product attributes.
     nextQuery.brand = brand;
-    nextQuery["attributes[0][attribute]"] = "pa_brand";
-    nextQuery["attributes[0][slug]"] = brand;
-    nextQuery.attribute_relation = "and";
   }
 
   return nextQuery;
@@ -416,48 +432,83 @@ function mapProductResponse(
   };
 }
 
-export async function getProducts(query: ProductQuery = {}) {
-  const response = await getPublicWooProducts(query);
+function mapFilterOptions(
+  options?: WooStoreProductAttributeTerm[] | WooStoreCategory[],
+): ProductFilterOption[] {
+  if (!Array.isArray(options)) return [];
 
-  if (query.sort === "featured" && response.success && !response.data.length) {
-    return getPublicWooProducts({ ...query, sort: "latest" });
-  }
-
-  return response;
+  return options
+    .filter((option) => option.slug && option.name)
+    .map((option) => ({
+      id: option.id,
+      name: decodeHtml(option.name),
+      slug: option.slug,
+      count: option.count,
+    }))
+    .sort((a, b) => a.name.localeCompare(b.name));
 }
 
-export async function getProductCategories(): Promise<
+function isBrandAttribute(attribute: WooStoreProductAttribute) {
+  const name = decodeHtml(attribute.name).toLowerCase();
+  const slug = decodeHtml(attribute.slug).toLowerCase();
+  const taxonomy = decodeHtml(attribute.taxonomy).toLowerCase();
+
+  return (
+    taxonomy === BRAND_ATTRIBUTE_TAXONOMY ||
+    slug === BRAND_ATTRIBUTE_TAXONOMY ||
+    slug === "brand" ||
+    name === "brand" ||
+    name.includes("brand")
+  );
+}
+
+async function getProductBrandsFromAttributes(): Promise<
   ApiResponse<ProductFilterOption[]>
 > {
-  const response = await fetchWooStore<WooStoreCategory[]>(
-    "/wc/store/v1/products/categories",
-    {
-      per_page: 100,
-    },
+  const attributesResponse = await fetchWooStore<WooStoreProductAttribute[]>(
+    "/wc/store/v1/products/attributes",
+    { per_page: 100 },
   );
 
-  if (!response.success) {
+  if (!attributesResponse.success || !Array.isArray(attributesResponse.data)) {
     return {
-      ...response,
+      success: false,
       data: [],
+      message: attributesResponse.message || "Unable to load product attributes.",
+    };
+  }
+
+  const brandAttribute = attributesResponse.data.find(isBrandAttribute);
+
+  if (!brandAttribute?.id) {
+    return {
+      success: false,
+      data: [],
+      message: "Brand attribute was not found.",
+    };
+  }
+
+  const termsResponse = await fetchWooStore<WooStoreProductAttributeTerm[]>(
+    `/wc/store/v1/products/attributes/${brandAttribute.id}/terms`,
+    { per_page: 100 },
+  );
+
+  if (!termsResponse.success) {
+    return {
+      success: false,
+      data: [],
+      message: termsResponse.message || "Unable to load product brands.",
     };
   }
 
   return {
     success: true,
-    data: (response.data || [])
-      .filter((category) => category.slug && category.name)
-      .map((category) => ({
-        id: category.id,
-        name: decodeHtml(category.name),
-        slug: category.slug,
-        count: category.count,
-      })),
+    data: mapFilterOptions(termsResponse.data),
     message: "Success",
   };
 }
 
-export async function getProductBrands(): Promise<
+async function getProductBrandsFromProducts(): Promise<
   ApiResponse<ProductFilterOption[]>
 > {
   const response = await getPublicWooProducts({
@@ -505,6 +556,88 @@ export async function getProductBrands(): Promise<
     ),
     message: "Success",
   };
+}
+
+export async function getProducts(query: ProductQuery = {}) {
+  const response = await getPublicWooProducts(query);
+
+  if (query.sort === "featured" && response.success && !response.data.length) {
+    return getPublicWooProducts({ ...query, sort: "latest" });
+  }
+
+  return response;
+}
+
+export async function getProductCategories(): Promise<
+  ApiResponse<ProductFilterOption[]>
+> {
+  const response = await fetchWooStore<WooStoreCategory[]>(
+    "/wc/store/v1/products/categories",
+    {
+      per_page: 100,
+    },
+  );
+
+  if (!response.success) {
+    return {
+      ...response,
+      data: [],
+    };
+  }
+
+  return {
+    success: true,
+    data: mapFilterOptions(response.data),
+    message: "Success",
+  };
+}
+
+async function getProductBrandsFromProductBrandTaxonomy(): Promise<
+  ApiResponse<ProductFilterOption[]>
+> {
+  const response = await fetchWooStore<{
+    success: boolean;
+    data: ProductFilterOption[];
+    message?: string;
+  }>("/lunex/v1/products/brands");
+
+  if (response.success && response.data?.success) {
+    return {
+      success: true,
+      data: Array.isArray(response.data.data) ? response.data.data : [],
+      message: response.data.message || "Success",
+    };
+  }
+
+  return {
+    success: false,
+    data: [],
+    message:
+      response.data?.message ||
+      response.message ||
+      "Unable to load product_brand terms.",
+  };
+}
+
+export async function getProductBrands(): Promise<
+  ApiResponse<ProductFilterOption[]>
+> {
+  // Your WordPress Brands screen is taxonomy=product_brand, not pa_brand attribute.
+  // So the main source must be the custom plugin endpoint below.
+  const taxonomyResponse = await getProductBrandsFromProductBrandTaxonomy();
+
+  if (taxonomyResponse.success) {
+    return taxonomyResponse;
+  }
+
+  // Fallback only: keeps the page safe if the custom plugin endpoint is not updated yet.
+  const attributeResponse = await getProductBrandsFromAttributes();
+
+  if (attributeResponse.success && attributeResponse.data.length) {
+    return attributeResponse;
+  }
+
+  return getProductBrandsFromProducts();
 }
 
 export async function getProductBySlug(
