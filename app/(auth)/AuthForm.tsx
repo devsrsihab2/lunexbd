@@ -166,7 +166,8 @@ export function AuthForm({ mode, redirectTo = "/account" }: Props) {
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isRegister = mode === "register";
-  const urlMessage = searchParams.get("error") || searchParams.get("message") || "";
+  const urlMessage =
+    searchParams.get("error") || searchParams.get("message") || "";
 
   const safeRedirectTo = useMemo(
     () => safeRedirectPath(redirectTo),
@@ -408,7 +409,7 @@ export function AuthForm({ mode, redirectTo = "/account" }: Props) {
 
         <div
           className={styles.socialRow}
-          aria-label={isRegister ? "Social registration" : "Social login"}
+          aria-label={isRegister ? "Social registrations" : "Social login"}
         >
           <a
             href={getSocialHref("google", safeRedirectTo, mode)}
