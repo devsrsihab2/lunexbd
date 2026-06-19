@@ -1,0 +1,65 @@
+.shell {
+  width: min(1180px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: clamp(1.5rem, 4vw, 3rem) 0;
+}
+
+.panel {
+  display: grid;
+  gap: 1rem;
+  border: 1px solid rgba(204, 135, 128, 0.2);
+  border-radius: 8px;
+  background: #fff;
+  padding: clamp(1rem, 3vw, 1.75rem);
+  box-shadow: 0 16px 42px rgba(35, 26, 24, 0.06);
+}
+
+.line,
+.block {
+  position: relative;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #f1e8e5;
+}
+
+.line::after,
+.block::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.66),
+    transparent
+  );
+  animation: shimmer 1.2s infinite;
+  transform: translateX(-100%);
+}
+
+.line {
+  height: 14px;
+}
+
+.line:nth-child(1) {
+  width: min(72%, 28rem);
+}
+
+.line:nth-child(2) {
+  width: min(92%, 42rem);
+}
+
+.line:nth-child(3) {
+  width: min(54%, 22rem);
+}
+
+.block {
+  height: clamp(10rem, 22vw, 16rem);
+  border-radius: 8px;
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}

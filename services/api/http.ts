@@ -8,6 +8,10 @@ type FetchOptions = Omit<RequestInit, "body"> & {
   query?: Record<string, QueryValue>;
   body?: unknown;
   auth?: boolean;
+  next?: {
+    revalidate?: number | false;
+    tags?: string[];
+  };
 };
 
 const STORE_NONCE_KEY = "lunex_store_nonce";
@@ -67,9 +71,11 @@ function addCacheBuster(url: string) {
   return `${url}${separator}_lunex_no_cache=${Date.now()}`;
 }
 
-function shouldBypassHttpCache(path: string, method: string) {
-  return ["GET", "HEAD"].includes(method) && (
-    path.startsWith("/wc/store/v1/") || path.startsWith("/lunex/v1/")
+function shouldBypassHttpCache(path: string, method: string, cache?: RequestCache) {
+  return (
+    ["GET", "HEAD"].includes(method) &&
+    cache === "no-store" &&
+    (path.startsWith("/wc/store/v1/") || path.startsWith("/lunex/v1/"))
   );
 }
 
@@ -160,6 +166,7 @@ function createHeaders(
   path: string,
   body: unknown,
   auth: boolean,
+  noStore: boolean,
   customHeaders?: HeadersInit,
 ) {
   const headers = new Headers();
@@ -195,9 +202,11 @@ function createHeaders(
     });
   }
 
-  headers.set("Cache-Control", "no-cache, no-store, max-age=0, must-revalidate");
-  headers.set("Pragma", "no-cache");
-  headers.set("Expires", "0");
+  if (noStore) {
+    headers.set("Cache-Control", "no-cache, no-store, max-age=0, must-revalidate");
+    headers.set("Pragma", "no-cache");
+    headers.set("Expires", "0");
+  }
 
   return headers;
 }
@@ -216,16 +225,19 @@ async function executeRequest<T>(
     ...restOptions
   } = options;
 
-  const requestUrl = shouldBypassHttpCache(path, requestMethod)
+  const noStore = restOptions.cache === "no-store";
+  const bypassHttpCache = shouldBypassHttpCache(path, requestMethod, restOptions.cache);
+
+  const requestUrl = bypassHttpCache
     ? addCacheBuster(buildUrl(path, query))
     : buildUrl(path, query);
 
   const response = await fetch(requestUrl, {
     ...restOptions,
     method: requestMethod,
-    cache: shouldBypassHttpCache(path, requestMethod) ? "no-store" : restOptions.cache,
+    cache: bypassHttpCache ? "no-store" : restOptions.cache,
     credentials,
-    headers: createHeaders(path, body, auth, headers),
+    headers: createHeaders(path, body, auth, noStore, headers),
     body: createBody(body),
   });
 

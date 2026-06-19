@@ -107,7 +107,7 @@ export async function getProductReviews(
       headers: {
         Accept: "application/json",
       },
-      cache: "no-store",
+      next: { revalidate: 300, tags: [`product-reviews-${productId}`] },
     });
 
     const rawResult = await parseResponse<{ success?: boolean; data?: ProductReview[] } | ProductReview[]>(response);
@@ -151,7 +151,7 @@ export async function getProductReviews(
         Accept: "application/json",
         Authorization: getAuthHeader(),
       },
-      cache: "no-store",
+      next: { revalidate: 300, tags: [`product-reviews-${productId}`] },
     });
 
     const result = await parseResponse<WooProductReview[]>(response);

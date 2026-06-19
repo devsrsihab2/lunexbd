@@ -379,7 +379,16 @@ export function Header({
   }, []);
 
   useEffect(() => {
-    closeMegaMenuInstantly();
+    const timer = window.setTimeout(() => {
+      if (closeTimerRef.current) {
+        window.clearTimeout(closeTimerRef.current);
+        closeTimerRef.current = null;
+      }
+      setActiveMegaMenu(null);
+      setClosingMegaMenu(null);
+    }, 0);
+
+    return () => window.clearTimeout(timer);
   }, [pathname]);
 
   useEffect(() => {

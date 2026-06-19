@@ -138,9 +138,12 @@ export function SearchBox({
 
     if (search.length < 2) {
       requestId.current += 1;
-      setSuggestions([]);
-      setLoading(false);
-      return;
+      const resetTimer = window.setTimeout(() => {
+        setSuggestions([]);
+        setLoading(false);
+      }, 0);
+
+      return () => window.clearTimeout(resetTimer);
     }
 
     const currentRequestId = requestId.current + 1;

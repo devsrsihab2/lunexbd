@@ -154,29 +154,46 @@ function addCacheBuster(url: string) {
 async function fetchWooStore<T>(
   path: string,
   query?: Record<string, QueryValue>,
-  options?: RequestInit & { noStore?: boolean },
+  options?: RequestInit & {
+    noStore?: boolean;
+    next?: {
+      revalidate?: number | false;
+      tags?: string[];
+    };
+  },
 ): Promise<ApiResponse<T>> {
   try {
-    const { noStore: _noStore, ...fetchOptions } = options || {};
+    const { noStore = false, headers, cache, next, ...fetchOptions } = options || {};
+    const shouldNoStore = noStore || cache === "no-store";
+    const requestUrl = shouldNoStore
+      ? addCacheBuster(buildUrl(path, query))
+      : buildUrl(path, query);
 
-    const response = await fetch(addCacheBuster(buildUrl(path, query)), {
-      method: "GET",
-      cache: "no-store",
-      headers: {
-        Accept: "application/json",
-        "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
-        Pragma: "no-cache",
-        Expires: "0",
-        ...(fetchOptions.headers || {}),
-      },
+    const requestHeaders: HeadersInit = {
+      Accept: "application/json",
+      ...(shouldNoStore
+        ? {
+            "Cache-Control": "no-cache, no-store, max-age=0, must-revalidate",
+            Pragma: "no-cache",
+            Expires: "0",
+          }
+        : {}),
+      ...(headers || {}),
+    };
+
+    const response = await fetch(requestUrl, {
       ...fetchOptions,
+      method: "GET",
+      cache: shouldNoStore ? "no-store" : cache,
+      next: shouldNoStore ? undefined : { revalidate: 60, ...(next || {}) },
+      headers: requestHeaders,
     });
 
     const contentType = response.headers.get("content-type");
     const isJson = contentType?.includes("application/json");
     const data = isJson ? await response.json() : null;
 
-    const headers = {
+    const responseHeaders = {
       "x-wp-total": response.headers.get("x-wp-total") || "",
       "x-wp-totalpages": response.headers.get("x-wp-totalpages") || "",
       "x-wp-page": String(query?.page || "1"),
@@ -190,7 +207,7 @@ async function fetchWooStore<T>(
           data?.message ||
           data?.error ||
           `Request failed with ${response.status}`,
-        headers,
+        headers: responseHeaders,
       };
     }
 
@@ -198,7 +215,7 @@ async function fetchWooStore<T>(
       success: true,
       data: data as T,
       message: "Success",
-      headers,
+      headers: responseHeaders,
     };
   } catch (error) {
     return {

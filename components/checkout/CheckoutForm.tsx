@@ -215,8 +215,6 @@ export function CheckoutForm({
 
     let active = true;
 
-    setIsLoadingCart(true);
-
     getCart()
       .then((response) => {
         if (!active) return;

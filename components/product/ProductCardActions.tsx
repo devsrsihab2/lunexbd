@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { addCartItem, rememberCartProductImage } from "@/services/api/cart.api";
 import { cartStore } from "@/store/cart.store";
@@ -73,13 +74,13 @@ export function ProductCardActions({ product }: { product: Product }) {
 
   return (
     <div className={styles.actions}>
-      <a
+      <Link
         className={styles.orderButton}
         href={checkoutHref}
         aria-label={`Order ${product.name} now`}
       >
         Order Now
-      </a>
+      </Link>
 
       <button
         className={styles.cartButton}

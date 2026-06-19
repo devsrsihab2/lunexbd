@@ -2,19 +2,27 @@ import { storefrontProxy } from "./http";
 import type { BlogPost, BlogPostsQuery, CmsPage, HomeContent, MenuItem, SiteSettings } from "@/types/content.types";
 
 export function getHome() {
-  return storefrontProxy<HomeContent>("/home", { cache: "no-store" });
+  return storefrontProxy<HomeContent>("/home", {
+    next: { revalidate: 300, tags: ["home"] },
+  });
 }
 
 export function getSettings() {
-  return storefrontProxy<SiteSettings>("/settings", { cache: "no-store" });
+  return storefrontProxy<SiteSettings>("/settings", {
+    next: { revalidate: 600, tags: ["settings"] },
+  });
 }
 
 export function getMenus() {
-  return storefrontProxy<{ top?: MenuItem[]; header: MenuItem[]; mega?: MenuItem[]; footer: MenuItem[] }>("/menus", { cache: "no-store" });
+  return storefrontProxy<{ top?: MenuItem[]; header: MenuItem[]; mega?: MenuItem[]; footer: MenuItem[] }>("/menus", {
+    next: { revalidate: 600, tags: ["menus"] },
+  });
 }
 
 export function getCmsPage(slug: string) {
-  return storefrontProxy<CmsPage>(`/pages/${slug}`);
+  return storefrontProxy<CmsPage>(`/pages/${slug}`, {
+    next: { revalidate: 600, tags: ["cms-pages", `cms-page-${slug}`] },
+  });
 }
 
 export async function getCmsPageWithFallbacks(slugs: string[]) {
@@ -31,11 +39,16 @@ export async function getCmsPageWithFallbacks(slugs: string[]) {
 }
 
 export function getBlogPosts(query: BlogPostsQuery = {}) {
-  return storefrontProxy<BlogPost[]>("/posts", { query });
+  return storefrontProxy<BlogPost[]>("/posts", {
+    query,
+    next: { revalidate: 300, tags: ["blog-posts"] },
+  });
 }
 
 export function getBlogPost(slug: string) {
-  return storefrontProxy<BlogPost>(`/posts/${slug}`);
+  return storefrontProxy<BlogPost>(`/posts/${slug}`, {
+    next: { revalidate: 300, tags: ["blog-posts", `blog-post-${slug}`] },
+  });
 }
 
 export function submitContact(payload: unknown) {

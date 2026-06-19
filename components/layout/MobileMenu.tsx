@@ -142,7 +142,11 @@ export function MobileMenu({
   }
 
   useEffect(() => {
-    closeMenu();
+    const timer = window.setTimeout(() => {
+      closeMenu();
+    }, 0);
+
+    return () => window.clearTimeout(timer);
   }, [pathname]);
 
   useEffect(() => {

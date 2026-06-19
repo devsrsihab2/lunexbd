@@ -1,9 +1,18 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Price } from "@/components/ui/Price";
 import type { Product } from "@/types/product.types";
 import { ProductCardActions } from "./ProductCardActions";
 import { WishlistButton } from "./WishlistButton";
 import styles from "./ProductCard.module.scss";
+
+function shouldUseOptimizer(src: string) {
+  return (
+    src.startsWith("/") ||
+    src.startsWith("https://images.unsplash.com") ||
+    src.startsWith("https://storage.googleapis.com")
+  );
+}
 
 export function ProductCard({ product, variant = "default" }: { product: Product; variant?: "default" | "listing" }) {
   const image = product.images?.find((item) => item.src);
@@ -34,11 +43,16 @@ export function ProductCard({ product, variant = "default" }: { product: Product
 
         <Link className={styles.imageLink} href={productHref}>
           {image?.src ? (
-            <img
+            <Image
               src={image.thumbnail || image.src}
               alt={image.alt || product.name}
-              loading="lazy"
-              decoding="async"
+              fill
+              sizes={
+                variant === "listing"
+                  ? "(max-width: 575px) 50vw, (max-width: 991px) 33vw, 25vw"
+                  : "(max-width: 575px) 50vw, (max-width: 991px) 25vw, 16vw"
+              }
+              unoptimized={!shouldUseOptimizer(image.thumbnail || image.src)}
             />
           ) : (
             <span className={styles.noImage}>No image</span>

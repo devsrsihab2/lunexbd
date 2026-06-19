@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import { Badge } from "@/components/ui/Badge";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { ProductGallery } from "@/components/product/ProductGallery";
 import { ProductGrid } from "@/components/product/ProductGrid";
+import { ProductGridSkeleton } from "@/components/product/ProductGridSkeleton";
 import {
   getProducts,
   getProductBySlug,
@@ -19,7 +21,6 @@ import { ProductWishlistAction } from "./ProductWishlistAction";
 import { ReviewForm } from "./ReviewForm";
 import styles from "./product-detail.module.scss";
 
-export const dynamic = "force-dynamic";
 export const dynamicParams = true;
 
 export async function generateStaticParams() {
@@ -104,6 +105,105 @@ function getSiteUrl() {
   ).replace(/\/$/, "");
 }
 
+async function RelatedProductsSection({ productId }: { productId: number }) {
+  const related = await getRelatedProducts(productId);
+
+  return (
+    <section className={styles.related}>
+      <h2>Related products</h2>
+      <ProductGrid products={related.success ? related.data : []} />
+    </section>
+  );
+}
+
+async function ReviewsSection({
+  productId,
+  productSlug,
+  fallbackRating,
+}: {
+  productId: number;
+  productSlug: string;
+  fallbackRating: number;
+}) {
+  const reviewsResponse = await getProductReviews(productId);
+  const reviews = reviewsResponse.success ? reviewsResponse.data : [];
+  const reviewStats = getReviewStats(
+    reviews,
+    reviews.length ? fallbackRating : 0,
+  );
+  const rating = reviewStats.average;
+  const reviewCount = reviews.length;
+  const reviewAction = submitProductReview.bind(null, productId, productSlug);
+  const reviewLoginHref = `/login?redirect=${encodeURIComponent(
+    `/product/${productSlug}#reviews`,
+  )}`;
+
+  return (
+    <>
+      <section className={styles.reviewPanel} id="reviews">
+        <div className={styles.reviewSummary}>
+          <div className={styles.ratingSummary}>
+            <div className={styles.score}>
+              <strong>{rating.toFixed(1)}</strong>
+              <span>Average Rating</span>
+              <small>({reviewCount} Reviews)</small>
+            </div>
+
+            <div className={styles.bars}>
+              {[5, 4, 3, 2, 1].map((star) => (
+                <div className={styles.bar} key={star}>
+                  <Stars value={star} />
+                  <span className={styles.track}>
+                    <span
+                      className={styles.fill}
+                      style={{
+                        width: reviewStats.total
+                          ? `${Math.round(
+                              (reviewStats.counts[star] / reviewStats.total) *
+                                100,
+                            )}%`
+                          : "0%",
+                      }}
+                    />
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className={styles.recommendation}>
+            <strong>{reviewStats.counts[5] + reviewStats.counts[4]}</strong>
+            <span>
+              Recommended ({reviewStats.counts[5] + reviewStats.counts[4]} of{" "}
+              {reviewCount || 0})
+            </span>
+          </div>
+        </div>
+
+        <ReviewForm action={reviewAction} loginHref={reviewLoginHref} />
+      </section>
+
+      <ProductReviewList reviews={reviews} />
+    </>
+  );
+}
+
+function ReviewsFallback() {
+  return (
+    <section className={styles.reviewPanel} id="reviews">
+      <div className={styles.reviewSummary}>
+        <div className={styles.detailSkeletonTitle} />
+        <div className={styles.detailSkeletonLine} />
+        <div className={styles.detailSkeletonLineShort} />
+      </div>
+      <div>
+        <div className={styles.detailSkeletonTitle} />
+        <div className={styles.detailSkeletonActions} />
+      </div>
+    </section>
+  );
+}
+
 export default async function ProductDetailPage({
   params,
 }: {
@@ -132,24 +232,10 @@ export default async function ProductDetailPage({
 
   const product = productResponse.data;
 
-  const [related, reviewsResponse] = await Promise.all([
-    getRelatedProducts(product.id),
-    getProductReviews(product.id),
-  ]);
-
   const fallbackRating = Number(product.averageRating) || 0;
-  const reviews = reviewsResponse.success ? reviewsResponse.data : [];
-  const reviewStats = getReviewStats(
-    reviews,
-    reviews.length ? fallbackRating : 0,
-  );
-  const rating = reviewStats.average;
-  const reviewCount = reviews.length;
+  const rating = fallbackRating;
+  const reviewCount = Number(product.reviewCount) || 0;
   const firstCategory = product.categories?.[0];
-  const reviewAction = submitProductReview.bind(null, product.id, product.slug);
-  const reviewLoginHref = `/login?redirect=${encodeURIComponent(
-    `/product/${product.slug}#reviews`,
-  )}`;
   const productUrl = `${getSiteUrl()}/product/${product.slug}`;
 
   return (
@@ -267,55 +353,24 @@ export default async function ProductDetailPage({
           </div>
         </section>
 
-        <section className={styles.reviewPanel} id="reviews">
-          <div className={styles.reviewSummary}>
-            <div className={styles.ratingSummary}>
-              <div className={styles.score}>
-                <strong>{rating.toFixed(1)}</strong>
-                <span>Average Rating</span>
-                <small>({reviewCount} Reviews)</small>
-              </div>
+        <Suspense fallback={<ReviewsFallback />}>
+          <ReviewsSection
+            productId={product.id}
+            productSlug={product.slug}
+            fallbackRating={fallbackRating}
+          />
+        </Suspense>
 
-              <div className={styles.bars}>
-                {[5, 4, 3, 2, 1].map((star) => (
-                  <div className={styles.bar} key={star}>
-                    <Stars value={star} />
-                    <span className={styles.track}>
-                      <span
-                        className={styles.fill}
-                        style={{
-                          width: reviewStats.total
-                            ? `${Math.round(
-                                (reviewStats.counts[star] / reviewStats.total) *
-                                  100,
-                              )}%`
-                            : "0%",
-                        }}
-                      />
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className={styles.recommendation}>
-              <strong>{reviewStats.counts[5] + reviewStats.counts[4]}</strong>
-              <span>
-                Recommended ({reviewStats.counts[5] + reviewStats.counts[4]} of{" "}
-                {reviewCount || 0})
-              </span>
-            </div>
-          </div>
-
-          <ReviewForm action={reviewAction} loginHref={reviewLoginHref} />
-        </section>
-
-        <ProductReviewList reviews={reviews} />
-
-        <section className={styles.related}>
-          <h2>Related products</h2>
-          <ProductGrid products={related.success ? related.data : []} />
-        </section>
+        <Suspense
+          fallback={
+            <section className={styles.related}>
+              <h2>Related products</h2>
+              <ProductGridSkeleton count={4} />
+            </section>
+          }
+        >
+          <RelatedProductsSection productId={product.id} />
+        </Suspense>
       </div>
     </main>
   );

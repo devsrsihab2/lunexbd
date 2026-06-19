@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useMemo, useState } from "react";
 import type { ProductImage } from "@/types/product.types";
 import styles from "./ProductGallery.module.scss";
@@ -8,6 +9,14 @@ type ProductGalleryProps = {
   images: ProductImage[];
   productName: string;
 };
+
+function shouldUseOptimizer(src: string) {
+  return (
+    src.startsWith("/") ||
+    src.startsWith("https://images.unsplash.com") ||
+    src.startsWith("https://storage.googleapis.com")
+  );
+}
 
 export function ProductGallery({ images, productName }: ProductGalleryProps) {
   const galleryImages = useMemo(
@@ -45,11 +54,12 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
             onClick={() => setActiveIndex(index)}
             aria-label={`View product image ${index + 1}`}
           >
-            <img
+            <Image
               src={image.thumbnail || image.src}
               alt={image.alt || productName}
-              loading="lazy"
-              decoding="async"
+              fill
+              sizes="72px"
+              unoptimized={!shouldUseOptimizer(image.thumbnail || image.src)}
             />
 
             {activeIndex === index ? (
@@ -62,11 +72,13 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
       </div>
 
       <div className={styles.mainImage}>
-        <img
+        <Image
           src={activeImage.src}
           alt={activeImage.alt || productName}
-          loading="eager"
-          decoding="async"
+          fill
+          priority
+          sizes="(max-width: 1080px) 100vw, 56vw"
+          unoptimized={!shouldUseOptimizer(activeImage.src)}
         />
       </div>
     </div>

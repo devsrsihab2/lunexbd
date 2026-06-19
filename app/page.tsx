@@ -1,4 +1,4 @@
-import { connection } from "next/server";
+import { Suspense } from "react";
 import { HeroBanner } from "@/components/home/HeroBanner";
 import { FeaturedCategories } from "@/components/home/FeaturedCategories";
 import { AllProductsSection } from "@/components/home/AllProductsSection";
@@ -6,14 +6,13 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { Button } from "@/components/ui/Button";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { ProductGrid } from "@/components/product/ProductGrid";
+import { ProductGridSkeleton } from "@/components/product/ProductGridSkeleton";
 import { getCategories } from "@/services/api/categories.api";
 import { getHome } from "@/services/api/content.api";
 import { getProducts } from "@/services/api/products.api";
 import type { HomeBanner, MenuItem } from "@/types/content.types";
 import { organizationSchema, websiteSchema } from "@/utils/schema";
 import styles from "./page.module.scss";
-
-export const dynamic = "force-dynamic";
 
 const fallbackBanners: HomeBanner[] = [
   {
@@ -59,17 +58,8 @@ function getDesignReadyBanners(homeBanners?: HomeBanner[]) {
   return banners?.length ? banners : fallbackBanners;
 }
 
-export default async function HomePage() {
-  await connection();
-
-  const [home, categories, latest, bestSelling, allProducts] =
-    await Promise.all([
-      getHome(),
-      getCategories(),
-      getProducts({ sort: "latest", page: "1", per_page: "8" }),
-      getProducts({ sort: "best_selling", page: "1", per_page: "8" }),
-      getProducts({ sort: "latest", page: "1", per_page: "8" }),
-    ]);
+async function HomeHeroSection() {
+  const [home, categories] = await Promise.all([getHome(), getCategories()]);
 
   const categoryItems = categories.success
     ? categories.data.filter((category) => category.count !== 0).slice(0, 8)
@@ -88,47 +78,127 @@ export default async function HomePage() {
         }));
 
   return (
-    <div className={styles.home}>
-      <JsonLd data={[websiteSchema(), organizationSchema()]} />
-
+    <>
       <HeroBanner banners={banners} menu={megaMenu} />
 
       <FeaturedCategories
         categories={home.success ? home.data.featuredCategories || [] : []}
       />
+    </>
+  );
+}
 
-      <section className={`${styles.section} ${styles.productSection}`}>
-        <SectionHeader
+async function HomeProductSection({
+  title,
+  text,
+  actionHref,
+  query,
+}: {
+  title: string;
+  text: string;
+  actionHref: string;
+  query: Parameters<typeof getProducts>[0];
+}) {
+  const products = await getProducts(query);
+
+  return (
+    <section className={`${styles.section} ${styles.productSection}`}>
+      <SectionHeader
+        title={title}
+        text={text}
+        action={
+          <Button href={actionHref} variant="secondary">
+            View all
+          </Button>
+        }
+      />
+
+      <ProductGrid products={products.data} />
+    </section>
+  );
+}
+
+async function HomeAllProductsSection() {
+  const allProducts = await getProducts({
+    sort: "latest",
+    page: "1",
+    per_page: "8",
+  });
+
+  return (
+    <AllProductsSection
+      initialProducts={allProducts.data}
+      initialPagination={allProducts.pagination}
+    />
+  );
+}
+
+function HomeProductFallback({
+  title,
+  text,
+}: {
+  title: string;
+  text: string;
+}) {
+  return (
+    <section className={`${styles.section} ${styles.productSection}`}>
+      <SectionHeader title={title} text={text} />
+      <ProductGridSkeleton count={8} />
+    </section>
+  );
+}
+
+export default function HomePage() {
+  return (
+    <div className={styles.home}>
+      <JsonLd data={[websiteSchema(), organizationSchema()]} />
+
+      <Suspense fallback={<HeroBanner banners={fallbackBanners} menu={[]} />}>
+        <HomeHeroSection />
+      </Suspense>
+
+      <Suspense
+        fallback={
+          <HomeProductFallback
+            title="Latest products"
+            text="Freshly added products from your WordPress catalog."
+          />
+        }
+      >
+        <HomeProductSection
           title="Latest products"
           text="Freshly added products from your WordPress catalog."
-          action={
-            <Button href="/products" variant="secondary">
-              View all
-            </Button>
-          }
+          actionHref="/products"
+          query={{ sort: "latest", page: "1", per_page: "8" }}
         />
+      </Suspense>
 
-        <ProductGrid products={latest.data} />
-      </section>
-
-      <section className={`${styles.section} ${styles.productSection}`}>
-        <SectionHeader
+      <Suspense
+        fallback={
+          <HomeProductFallback
+            title="Best selling products"
+            text="Popular products customers are buying the most."
+          />
+        }
+      >
+        <HomeProductSection
           title="Best selling products"
           text="Popular products customers are buying the most."
-          action={
-            <Button href="/products?sort=best_selling" variant="secondary">
-              View all
-            </Button>
-          }
+          actionHref="/products?sort=best_selling"
+          query={{ sort: "best_selling", page: "1", per_page: "8" }}
         />
+      </Suspense>
 
-        <ProductGrid products={bestSelling.data} />
-      </section>
-
-      <AllProductsSection
-        initialProducts={allProducts.data}
-        initialPagination={allProducts.pagination}
-      />
+      <Suspense
+        fallback={
+          <HomeProductFallback
+            title="All Products"
+            text="Browse all available products from our latest collection."
+          />
+        }
+      >
+        <HomeAllProductsSection />
+      </Suspense>
     </div>
   );
 }

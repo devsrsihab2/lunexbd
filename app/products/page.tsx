@@ -9,8 +9,6 @@ import type { ProductQuery } from "@/types/product.types";
 import { createMetadata } from "@/utils/seo";
 import styles from "./products.module.scss";
 
-export const dynamic = "force-dynamic";
-
 export const metadata: Metadata = createMetadata({
   title: "Products",
   path: "/products",

@@ -14,8 +14,6 @@ type CategoryPageProps = {
   searchParams: Promise<Record<string, string | undefined>>;
 };
 
-export const dynamic = "force-dynamic";
-
 function formatCategoryTitle(slug: string) {
   return slug
     .split("-")
