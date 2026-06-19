@@ -27,6 +27,11 @@
   box-shadow: 0 18px 34px rgba(204, 135, 128, 0.26);
 }
 
+.warning {
+  background: #b42318;
+  box-shadow: 0 18px 34px rgba(180, 35, 24, 0.2);
+}
+
 .hero span {
   color: #cc8780;
   font-size: 0.78rem;
@@ -59,6 +64,98 @@
 .receipt {
   display: grid;
   gap: 1rem;
+}
+
+.paymentBanner {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid rgba(204, 135, 128, 0.28);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 16px 38px rgba(17, 24, 39, 0.06);
+  padding: clamp(1rem, 2.5vw, 1.35rem);
+}
+
+.paymentBanner span {
+  display: inline-flex;
+  width: fit-content;
+  margin-bottom: 0.5rem;
+  border-radius: 999px;
+  padding: 0.34rem 0.62rem;
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.paymentBanner h2 {
+  margin: 0;
+  color: #111;
+  font-size: clamp(1.25rem, 3vw, 1.75rem);
+}
+
+.paymentBanner p {
+  max-width: 42rem;
+  margin: 0.35rem 0 0;
+  color: #58605d;
+  line-height: 1.6;
+}
+
+.paymentBanner dl {
+  display: grid;
+  gap: 0.7rem;
+  margin: 0;
+}
+
+.paymentBanner dl div {
+  display: grid;
+  gap: 0.2rem;
+  border: 1px solid #efe3de;
+  border-radius: 7px;
+  background: #fffdfc;
+  padding: 0.78rem;
+}
+
+.paymentBanner dt {
+  color: #6a706d;
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.paymentBanner dd {
+  margin: 0;
+  color: #111;
+  font-weight: 900;
+}
+
+.paid {
+  border-color: rgba(15, 107, 85, 0.28);
+  background: linear-gradient(135deg, #ffffff, #f3fbf7);
+}
+
+.paid span {
+  background: rgba(15, 107, 85, 0.12);
+  color: #0f6b55;
+}
+
+.paid dd:last-child,
+.paid h2 {
+  color: #0f6b55;
+}
+
+.unpaid {
+  border-color: rgba(180, 35, 24, 0.24);
+  background: linear-gradient(135deg, #ffffff, #fff8f6);
+}
+
+.unpaid span {
+  background: rgba(180, 35, 24, 0.1);
+  color: #b42318;
+}
+
+.unpaid h2 {
+  color: #b42318;
 }
 
 .summary {
@@ -271,6 +368,15 @@
 }
 
 @media (min-width: 760px) {
+  .paymentBanner {
+    grid-template-columns: minmax(0, 1fr) minmax(22rem, 0.7fr);
+    align-items: center;
+  }
+
+  .paymentBanner dl {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
   .summary {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }

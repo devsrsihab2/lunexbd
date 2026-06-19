@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { login, register } from "@/services/api/auth.api";
 import styles from "./auth.module.scss";
@@ -20,8 +20,7 @@ type TokenPayload = {
   user?: unknown;
 };
 
-const SOCIAL_PROVIDERS = ["google", "facebook"] as const;
-type SocialProvider = (typeof SOCIAL_PROVIDERS)[number];
+type SocialProvider = "google" | "facebook";
 
 function UserIcon() {
   return (
@@ -152,14 +151,8 @@ function getSocialHref(
   redirectTo: string,
   mode: Mode,
 ) {
-  const callbackUrl =
-    typeof window === "undefined"
-      ? `/login?redirect=${encodeURIComponent(redirectTo)}`
-      : `${window.location.origin}/login?redirect=${encodeURIComponent(redirectTo)}`;
-
   const params = new URLSearchParams({
     redirect: redirectTo,
-    callback: callbackUrl,
     mode,
   });
 
@@ -168,12 +161,12 @@ function getSocialHref(
 
 export function AuthForm({ mode, redirectTo = "/account" }: Props) {
   const router = useRouter();
-  const pathname = usePathname();
   const searchParams = useSearchParams();
 
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const isRegister = mode === "register";
+  const urlMessage = searchParams.get("error") || searchParams.get("message") || "";
 
   const safeRedirectTo = useMemo(
     () => safeRedirectPath(redirectTo),
@@ -181,10 +174,7 @@ export function AuthForm({ mode, redirectTo = "/account" }: Props) {
   );
 
   useEffect(() => {
-    const error = searchParams.get("error") || searchParams.get("message");
-
-    if (error) {
-      setMessage(error);
+    if (urlMessage) {
       return;
     }
 
@@ -202,7 +192,7 @@ export function AuthForm({ mode, redirectTo = "/account" }: Props) {
     if (token) {
       router.replace(safeRedirectTo);
     }
-  }, [router, safeRedirectTo, searchParams]);
+  }, [router, safeRedirectTo, searchParams, urlMessage]);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -394,7 +384,9 @@ export function AuthForm({ mode, redirectTo = "/account" }: Props) {
               </div>
             )}
 
-            {message ? <p className={styles.alert}>{message}</p> : null}
+            {message || urlMessage ? (
+              <p className={styles.alert}>{message || urlMessage}</p>
+            ) : null}
 
             <button
               className={styles.submitButton}
@@ -410,7 +402,7 @@ export function AuthForm({ mode, redirectTo = "/account" }: Props) {
           </form>
         </div>
 
-        {/* <div className={styles.divider}>
+        <div className={styles.divider}>
           <span>{isRegister ? "or register with" : "or sign in with"}</span>
         </div>
 
@@ -431,7 +423,7 @@ export function AuthForm({ mode, redirectTo = "/account" }: Props) {
           >
             <FacebookIcon />
           </a>
-        </div> */}
+        </div>
 
         <p className={styles.switchText}>
           {isRegister ? "Already have an account?" : "Don't have any account?"}{" "}

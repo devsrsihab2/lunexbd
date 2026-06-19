@@ -3,14 +3,39 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect } from "react";
 
+function safeRedirectPath(path?: string | null) {
+  if (!path) return "/account";
+
+  try {
+    const decoded = decodeURIComponent(path);
+
+    if (!decoded.startsWith("/") || decoded.startsWith("//")) {
+      return "/account";
+    }
+
+    return decoded;
+  } catch {
+    return "/account";
+  }
+}
+
 function SocialAuthCallback() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
   useEffect(() => {
     const token = searchParams.get("accessToken") || searchParams.get("token") || "";
-    const redirectTo = searchParams.get("redirect") || "/account";
+    const redirectTo = safeRedirectPath(searchParams.get("redirect"));
     const user = searchParams.get("user");
+    const error = searchParams.get("error") || searchParams.get("message");
+
+    if (error) {
+      const loginUrl = new URL("/login", window.location.origin);
+      loginUrl.searchParams.set("redirect", redirectTo);
+      loginUrl.searchParams.set("error", error);
+      router.replace(`${loginUrl.pathname}${loginUrl.search}`);
+      return;
+    }
 
     if (token) {
       localStorage.setItem("accessToken", token);

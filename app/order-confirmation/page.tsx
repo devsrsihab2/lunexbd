@@ -21,28 +21,55 @@ export default async function OrderConfirmationPage({
   const query = await searchParams;
   const orderId = query.orderId || query.order_id || "";
   const orderKey = query.orderKey || query.order_key || "";
+  const paymentStatus = query.paymentStatus || "";
+  const isPaymentSuccess = paymentStatus === "success";
+  const isPaymentIssue = [
+    "failed",
+    "failure",
+    "cancel",
+    "cancelled",
+    "retry",
+  ].includes(paymentStatus);
   const response =
     orderId && orderKey
       ? await trackOrder({ orderId, orderKey })
       : null;
   const order = response?.success ? response.data : null;
+  const heroEyebrow = isPaymentSuccess
+    ? "bKash payment successful"
+    : isPaymentIssue
+      ? "Payment needs attention"
+      : "Order confirmed";
+  const heroTitle = isPaymentSuccess
+    ? "Your payment is complete."
+    : isPaymentIssue
+      ? "We could not complete the payment."
+      : "Thank you for shopping with Lunex.";
+  const heroMessage =
+    isPaymentSuccess && order
+      ? `We received your bKash payment for order #${order.number || order.id}. Your Lunex order is now ${order.status.replace("-", " ")}.`
+      : isPaymentIssue && order
+        ? `Order #${order.number || order.id} is saved, but the bKash payment was not completed. You can contact us or place the order again.`
+        : order
+          ? `Your order #${order.number || order.id} is now ${order.status.replace("-", " ")}.`
+          : "Your order was received. Add the order key to this page URL to view the secure order summary.";
 
   return (
     <main className={styles.page}>
       <section className={styles.hero}>
-        <div className={styles.check} aria-hidden="true">
+        <div className={isPaymentIssue ? `${styles.check} ${styles.warning}` : styles.check} aria-hidden="true">
           <CheckIcon />
         </div>
-        <span>Order confirmed</span>
-        <h1>Thank you for shopping with Lunex.</h1>
-        <p>
-          {order
-            ? `Your order #${order.number || order.id} is now ${order.status.replace("-", " ")}.`
-            : "Your order was received. Add the order key to this page URL to view the secure order summary."}
-        </p>
+        <span>{heroEyebrow}</span>
+        <h1>{heroTitle}</h1>
+        <p>{heroMessage}</p>
       </section>
 
       <div className={styles.inner}>
+        {paymentStatus ? (
+          <PaymentBanner status={paymentStatus} order={order} />
+        ) : null}
+
         {order ? (
           <OrderReceipt order={order} />
         ) : (
@@ -62,6 +89,38 @@ export default async function OrderConfirmationPage({
         </div>
       </div>
     </main>
+  );
+}
+
+function PaymentBanner({ status, order }: { status: string; order: Order | null }) {
+  const success = status === "success";
+  const title = success ? "bKash payment received" : "bKash payment not completed";
+  const message = success
+    ? "Your transaction has been verified and attached to this WooCommerce order."
+    : "Your order details are available below. Payment can be retried or handled by support.";
+
+  return (
+    <section className={success ? `${styles.paymentBanner} ${styles.paid}` : `${styles.paymentBanner} ${styles.unpaid}`}>
+      <div>
+        <span>{success ? "Paid" : "Action needed"}</span>
+        <h2>{title}</h2>
+        <p>{message}</p>
+      </div>
+      <dl>
+        <div>
+          <dt>Order</dt>
+          <dd>{order ? `#${order.number || order.id}` : "Pending"}</dd>
+        </div>
+        <div>
+          <dt>Payment method</dt>
+          <dd>{order?.paymentMethodTitle || "bKash"}</dd>
+        </div>
+        <div>
+          <dt>Total</dt>
+          <dd>{order ? formatPrice(order.total) : "-"}</dd>
+        </div>
+      </dl>
+    </section>
   );
 }
 

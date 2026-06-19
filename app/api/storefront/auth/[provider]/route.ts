@@ -55,13 +55,13 @@ export async function GET(request: NextRequest, context: RouteContext) {
     request.nextUrl.searchParams.get("redirect"),
   );
 
-  const callbackUrl = new URL("/login", request.nextUrl.origin);
-  callbackUrl.searchParams.set("redirect", redirect);
+  const callbackUrl = new URL("/auth/callback", request.nextUrl.origin);
 
   const targetUrl = new URL(`${wpBaseUrl}/wp-json/lunex/v1/auth/${provider}`);
 
   targetUrl.searchParams.set("redirect", redirect);
   targetUrl.searchParams.set("callback", callbackUrl.toString());
+  targetUrl.searchParams.set("mode", request.nextUrl.searchParams.get("mode") || "login");
 
   return NextResponse.redirect(targetUrl);
 }
