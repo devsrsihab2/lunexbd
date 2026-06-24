@@ -901,3 +901,136 @@
     justify-self: start;
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PASTE at the bottom of CheckoutForm.module.scss
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Saved address picker ─────────────────────────────────────────────────── */
+.savedAddresses {
+  margin-bottom: 1.25rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1.5px solid #f0e9e5;
+}
+
+.savedAddressLabel {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #6b5e58;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0 0 0.75rem;
+}
+
+.savedAddressCards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.75rem;
+}
+
+.savedAddressCard {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  border: 1.5px solid #e8ddd9;
+  border-radius: 11px;
+  padding: 0.85rem 1rem;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  background: #fdfaf8;
+
+  input[type="radio"] {
+    margin-top: 3px;
+    flex-shrink: 0;
+    accent-color: #cc8780;
+    width: 15px;
+    height: 15px;
+  }
+
+  span {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  strong {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #17110d;
+  }
+
+  small {
+    font-size: 0.78rem;
+    color: #6b5e58;
+    line-height: 1.4;
+  }
+
+  &:has(input:checked) {
+    border-color: #cc8780;
+    background: #fff5f3;
+  }
+}
+
+/* ── Save address row ─────────────────────────────────────────────────────── */
+.saveAddressRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  padding: 0.875rem 1rem;
+  background: #fdfaf8;
+  border-radius: 10px;
+  border: 1.5px solid #e8ddd9;
+}
+
+.saveAddressCheck {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  color: #17110d;
+
+  input {
+    accent-color: #cc8780;
+    width: 15px;
+    height: 15px;
+  }
+}
+
+.saveAddressType {
+  font-size: 0.85rem;
+  border: 1.5px solid #e8ddd9;
+  border-radius: 7px;
+  padding: 0.3rem 0.7rem;
+  background: #fff;
+  color: #17110d;
+  cursor: pointer;
+  outline: none;
+
+  &:focus {
+    border-color: #cc8780;
+  }
+}
+
+.saveAddressHint {
+  font-size: 0.78rem;
+  color: #6b5e58;
+  width: 100%;
+  margin: 0;
+}

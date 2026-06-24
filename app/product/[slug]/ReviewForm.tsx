@@ -107,15 +107,6 @@ export function ReviewForm({ action, loginHref }: ReviewFormProps) {
         {state.errors?.rating ? <small>{state.errors.rating}</small> : null}
       </label>
 
-      <label className={styles.reviewField}>
-        <span>Name</span>
-        <input
-          name="reviewer"
-          placeholder="Your name"
-          aria-invalid={Boolean(state.errors?.reviewer)}
-        />
-        {state.errors?.reviewer ? <small>{state.errors.reviewer}</small> : null}
-      </label>
 
       {state.message ? (
         <p

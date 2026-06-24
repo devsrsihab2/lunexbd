@@ -232,6 +232,32 @@ $line: rgba(204, 135, 128, 0.24);
   }
 }
 
+.logoutSidebarBtn {
+  margin-top: 1rem;
+  background: #d32f2f;
+  color: #fff;
+  border-color: #d32f2f;
+
+  .navIcon {
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+  }
+
+  > svg {
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  strong {
+    color: #fff;
+  }
+
+  &:hover {
+    background: #b71c1c;
+    border-color: #b71c1c;
+    color: #fff;
+  }
+}
+
 .active {
   border-color: rgba($brand, 0.36);
   background: $tint;
@@ -1153,3 +1179,720 @@ $line: rgba(204, 135, 128, 0.24);
     margin-inline: auto;
   }
 }
+/* ═══════════════════════════════════════════════════════════════════════════
+   REPLACE the existing modal + address styles in account.module.scss
+   with these. Find the old blocks by their class names and swap them out.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Address grid & cards ─────────────────────────────────────────────────── */
+/* Address grid — 2 cards per row on large screens, 1 on mobile */
+.addressGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+  gap: 1rem;
+  margin-top: 1.25rem;
+}
+
+/* ── Address Card — horizontal layout ─────────────────────────────────────── */
+.addressCard {
+  position: relative;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  border: 1.5px solid $line;
+  border-radius: 16px;
+  background: rgba($paper, 0.96);
+  overflow: hidden;
+  transition:
+    box-shadow 220ms ease,
+    border-color 220ms ease,
+    transform 220ms ease;
+
+  &:hover {
+    transform: translateY(-3px);
+    border-color: rgba($brand, 0.42);
+    box-shadow:
+      0 12px 36px rgba(64, 43, 41, 0.11),
+      0 3px 10px rgba($brand, 0.09);
+  }
+}
+
+/* Top stripe — coloured accent bar at top of card */
+.addressCard::before {
+  content: "";
+  display: block;
+  height: 3px;
+  background: linear-gradient(90deg, rgba($brand, 0.55), rgba($brand, 0.15));
+}
+
+.addressCardHome::before  { background: linear-gradient(90deg, $brand-deep, rgba($brand, 0.2)); }
+.addressCardOffice::before { background: linear-gradient(90deg, #3d4a8a, rgba(79, 91, 149, 0.18)); }
+
+/* Inner content wrapper */
+.addressCardInner {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 1.15rem 1.25rem 1.2rem;
+}
+
+/* ── Card Header row: icon | label | spacer | actions ─────────────────────── */
+.addressCardHead {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-width: 0; /* prevent overflow */
+
+  strong {
+    /* label must NOT shrink or wrap — push actions to the right */
+    flex: 0 0 auto;
+    white-space: nowrap;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: $ink;
+    letter-spacing: -0.01em;
+  }
+
+  /* elastic spacer */
+  &::after {
+    content: "";
+    flex: 1;
+  }
+}
+
+/* Icon bubble */
+.addressIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 10px;
+  flex-shrink: 0;
+
+  svg {
+    width: 1.1rem;
+    height: 1.1rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.9;
+  }
+}
+
+.addressIconHome {
+  background: rgba($brand, 0.14);
+  color: $brand-deep;
+}
+
+.addressIconOffice {
+  background: rgba(79, 91, 149, 0.13);
+  color: #3d4a8a;
+}
+
+/* ── Action buttons — always on one line, never wrap ─────────────────────── */
+.addressActions {
+  display: flex;
+  gap: 0.35rem;
+  flex-shrink: 0;
+  margin-left: 0; /* spacer in ::after handles separation */
+
+  button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.28rem;
+    white-space: nowrap;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.3rem 0.62rem;
+    border-radius: 7px;
+    border: 1.5px solid $line;
+    background: transparent;
+    cursor: pointer;
+    color: $muted;
+    transition:
+      background 140ms ease,
+      border-color 140ms ease,
+      color 140ms ease;
+
+    svg {
+      width: 11px;
+      height: 11px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      flex-shrink: 0;
+    }
+
+    &:hover {
+      background: $tint;
+      border-color: rgba($brand, 0.32);
+      color: $brand-deep;
+    }
+  }
+
+  .deleteBtn {
+    color: #b94040;
+    border-color: rgba(185, 64, 64, 0.22);
+
+    &:hover {
+      background: rgba(185, 64, 64, 0.07);
+      border-color: rgba(185, 64, 64, 0.48);
+      color: #9b2525;
+    }
+
+    &:disabled {
+      opacity: 0.38;
+      cursor: not-allowed;
+    }
+  }
+}
+
+/* ── Card body — address detail rows ─────────────────────────────────────── */
+.addressCardBody {
+  margin-top: 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  padding: 1rem;
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba($brand, 0.02), rgba($tint, 0.3));
+  border: 1px solid rgba($brand, 0.1);
+
+  .addressRow {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    gap: 1rem;
+    align-items: start;
+
+    span:first-child {
+      font-size: 0.85rem;
+      color: $muted;
+    }
+
+    span:last-child {
+      font-size: 0.88rem;
+      color: $ink;
+      font-weight: 500;
+      line-height: 1.4;
+    }
+  }
+}
+
+/* Address mini cards (dashboard summary) */
+.addressMini {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.addressMiniCard {
+  border: 1.5px solid $line;
+  border-radius: $radius-md;
+  padding: 0.9rem 1rem;
+  background: rgba($paper, 0.88);
+  transition: border-color 180ms ease;
+
+  &:hover {
+    border-color: rgba($brand, 0.3);
+  }
+
+  strong {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+    color: $ink;
+  }
+
+  p {
+    font-size: 0.8rem;
+    color: $muted;
+    margin: 0;
+    line-height: 1.45;
+  }
+}
+
+/* Add address button */
+.addButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.42rem;
+  padding: 0 1.15rem;
+  min-height: 2.6rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  border-radius: $radius-md;
+  border: 1.5px solid rgba($brand, 0.35);
+  color: $brand-deep;
+  background: rgba($brand, 0.06);
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease,
+    box-shadow 160ms ease;
+
+  svg {
+    width: 15px;
+    height: 15px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  &:hover {
+    background: $brand;
+    border-color: $brand;
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 22px rgba($brand, 0.28);
+  }
+}
+
+/* Modal overlay */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(23, 17, 13, 0.5);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  animation: overlayIn 200ms ease both;
+
+  @keyframes overlayIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+}
+
+/* Modal box */
+.modal {
+  background: $paper;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 540px;
+  max-height: 92vh;
+  overflow-y: auto;
+  box-shadow:
+    0 32px 80px rgba(23, 17, 13, 0.22),
+    0 4px 16px rgba(23, 17, 13, 0.08);
+  animation: modalIn 220ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  border: 1px solid $line;
+  scrollbar-width: thin;
+  scrollbar-color: rgba($brand, 0.22) transparent;
+
+  &::-webkit-scrollbar { width: 5px; }
+  &::-webkit-scrollbar-thumb {
+    background: rgba($brand, 0.3);
+    border-radius: 99px;
+  }
+
+  @keyframes modalIn {
+    from { opacity: 0; transform: translateY(18px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+}
+
+/* Modal header */
+.modalHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.35rem 1.6rem 1.1rem;
+  border-bottom: 1.5px solid rgba($brand, 0.1);
+  background: linear-gradient(135deg, rgba($brand, 0.06), rgba($paper, 0.98));
+  border-radius: 20px 20px 0 0;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+
+  h2 {
+    font-size: 1.08rem;
+    font-weight: 700;
+    margin: 0;
+    color: $ink;
+    letter-spacing: -0.01em;
+  }
+
+  button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: rgba($brand, 0.08);
+    border: 1.5px solid $line;
+    border-radius: 50%;
+    font-size: 0.9rem;
+    cursor: pointer;
+    color: $muted;
+    flex-shrink: 0;
+    transition:
+      background 150ms ease,
+      color 150ms ease,
+      border-color 150ms ease;
+
+    &:hover {
+      background: rgba($brand, 0.18);
+      color: $ink;
+      border-color: rgba($brand, 0.35);
+    }
+  }
+}
+
+/* Modal form fields */
+.modal .formFields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.1rem 1.25rem;
+  padding: 1.4rem 1.6rem;
+
+  label:first-child  { grid-column: 1 / -1; }
+  label:nth-child(2) { grid-column: 1 / -1; }
+  label:last-of-type { grid-column: 1 / -1; }
+
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.42rem;
+
+    span {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: $muted;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    input,
+    select {
+      height: 44px;
+      border: 1.5px solid $line;
+      border-radius: 10px;
+      padding: 0 0.9rem;
+      font-size: 0.9rem;
+      color: $ink;
+      background: rgba(255, 255, 255, 0.78);
+      outline: none;
+      font: inherit;
+      transition:
+        border-color 150ms ease,
+        box-shadow 150ms ease,
+        background 150ms ease;
+      width: 100%;
+      box-sizing: border-box;
+
+      &::placeholder { color: rgba($muted, 0.55); }
+
+      &:focus {
+        border-color: $brand;
+        box-shadow: 0 0 0 3px rgba($brand, 0.16);
+        background: #fff;
+      }
+
+      &:disabled {
+        opacity: 0.48;
+        cursor: not-allowed;
+        background: $tint;
+      }
+    }
+
+    select {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23746b68' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.9rem center;
+      padding-right: 2.4rem;
+      cursor: pointer;
+    }
+  }
+
+  p.errorMessage {
+    grid-column: 1 / -1;
+    margin: 0;
+  }
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+    padding: 1.1rem 1.2rem;
+
+    label:first-child,
+    label:nth-child(2),
+    label:last-of-type { grid-column: 1; }
+  }
+}
+
+/* Modal action row */
+.modalActions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 1rem 1.6rem 1.4rem;
+  border-top: 1.5px solid rgba($brand, 0.08);
+  background: rgba($tint, 0.5);
+  border-radius: 0 0 20px 20px;
+
+  button:first-child {
+    flex-shrink: 0;
+    white-space: nowrap;
+    background: rgba(255, 255, 255, 0.8);
+    border: 1.5px solid $line;
+    border-radius: 10px;
+    padding: 0 1.2rem;
+    cursor: pointer;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: $muted;
+    min-height: 2.75rem;
+    font: inherit;
+    transition:
+      background 150ms ease,
+      border-color 150ms ease,
+      color 150ms ease;
+
+    &:hover {
+      background: $tint;
+      border-color: rgba($brand, 0.28);
+      color: $ink;
+    }
+  }
+
+  .primaryAction {
+    flex: 1;
+    width: 100% !important;
+    white-space: nowrap;
+    min-width: 0;
+    font-size: 0.9rem;
+    letter-spacing: 0.01em;
+  }
+
+  @media (max-width: 480px) {
+    padding: 0.9rem 1.2rem 1.2rem;
+  }
+}
+
+/* Avatar uploader */
+.avatarUploader {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1rem 0 1.35rem;
+  border-bottom: 1.5px solid rgba($brand, 0.1);
+  margin-bottom: 1.25rem;
+}
+
+.avatarPreview {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.cameraButton {
+  position: absolute;
+  bottom: -3px;
+  right: -3px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: $brand;
+  color: #fff;
+  border: 2.5px solid #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: background 150ms ease;
+  box-shadow: 0 2px 8px rgba($brand, 0.35);
+
+  svg {
+    width: 13px;
+    height: 13px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+  }
+
+  &:hover { background: $brand-deep; }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+.hiddenFileInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.avatarMeta {
+  flex: 1;
+
+  strong {
+    display: block;
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin-bottom: 0.2rem;
+    color: $ink;
+  }
+
+  p {
+    font-size: 0.8rem;
+    color: $muted;
+    margin: 0 0 0.5rem;
+  }
+}
+
+.removeAvatarBtn {
+  font-size: 0.78rem;
+  color: #b94040;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+
+  &:hover { color: #7d1f1f; }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+// ─── Account Reviews List ─────────────────────────────────────────────────────
+
+.reviewsList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-top: 0.5rem;
+}
+
+.reviewItem {
+  border: 1px solid rgba(204, 135, 128, 0.2);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  background: #fffaf9;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  transition: box-shadow 0.18s ease;
+
+  &:hover {
+    box-shadow: 0 4px 18px rgba(64, 43, 41, 0.1);
+  }
+}
+
+.reviewProductLink {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  color: #1d1b1b;
+  font-weight: 600;
+  font-size: 0.95rem;
+
+  &:hover {
+    color: #c0956b;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+}
+
+.reviewProductImg {
+  width: 52px;
+  height: 52px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid rgba(204, 135, 128, 0.2);
+  flex-shrink: 0;
+}
+
+.reviewMeta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.reviewStars {
+  display: flex;
+  align-items: center;
+  font-size: 1.1rem;
+  gap: 1px;
+  line-height: 1;
+
+  span:last-child {
+    font-size: 0.8rem;
+    color: #746b68;
+  }
+}
+
+.reviewDate {
+  font-size: 0.82rem;
+  color: #a09490;
+}
+
+.reviewText {
+  font-size: 0.92rem;
+  color: #4a4140;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.pageHeader {
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid $line;
+
+  h1 {
+    margin: 0.35rem 0 0.55rem;
+    color: $ink;
+    font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+    line-height: 1.1;
+    letter-spacing: 0;
+  }
+
+  p:last-child {
+    margin: 0;
+    color: $muted;
+    font-size: clamp(0.95rem, 1.2vw, 1.05rem);
+    line-height: 1.6;
+  }
+}
+
+.logoutSidebarBtn {
+  margin-top: 1rem;
+  background: #e74c3c;
+  color: #fff;
+  border-color: #e74c3c;
+  text-align: left;
+  border-radius: $radius-sm;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background: #c0392b;
+    border-color: #c0392b;
+    color: #fff;
+  }
+
+  strong, small {
+    color: #fff !important;
+  }
+
+  .navIcon {
+    background: rgba(255, 255, 255, 0.2) !important;
+    color: #fff !important;
+  }
+}
+

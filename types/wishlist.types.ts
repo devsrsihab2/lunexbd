@@ -6,5 +6,11 @@ export type WishlistSettings = {
 
 export type Wishlist = {
   items: Product[];
+  pagination: {
+    totalItems: number;
+    totalPages: number;
+    currentPage: number;
+    limit: number;
+  };
   settings: WishlistSettings;
 };

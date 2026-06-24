@@ -9,7 +9,7 @@ export default function OrderTrackingPage() {
         eyebrow="Order Tracking"
         title="Track an order"
         text="Use your order ID and phone number, or enter only the tracking number to see the latest status."
-        image="/lunex/travel-bag.png"
+        image="/lunex/tracking-order.jpg"
       />
       <OrderTrackingClient />
     </main>

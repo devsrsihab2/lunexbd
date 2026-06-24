@@ -266,3 +266,63 @@ export async function createProductReview(
     };
   }
 }
+
+export type UserReview = ProductReview & {
+  product?: {
+    id: number;
+    name: string;
+    slug: string;
+    permalink: string;
+    image?: { src: string; alt: string } | null;
+  };
+};
+
+export async function getUserReviews(
+  authToken: string,
+): Promise<ApiResponse<UserReview[]>> {
+  try {
+    const url = new URL("/wp-json/lunex/v1/me/reviews", `${getWooBaseUrl()}/`);
+
+    const response = await fetch(url, {
+      headers: {
+        Accept: "application/json",
+        Authorization: `Bearer ${authToken}`,
+      },
+      cache: "no-store",
+    });
+
+    const result = await parseResponse<
+      { success?: boolean; data?: UserReview[] } | UserReview[]
+    >(response);
+
+    if (result.success) {
+      const payload = result.data;
+
+      if (Array.isArray(payload)) {
+        return { ...result, data: payload };
+      }
+
+      if (
+        payload &&
+        typeof payload === "object" &&
+        Array.isArray((payload as { data?: UserReview[] }).data)
+      ) {
+        return {
+          success: true,
+          data: (payload as { data: UserReview[] }).data,
+          message: result.message,
+          status: result.status,
+        };
+      }
+    }
+
+    return { ...result, data: [] };
+  } catch (error) {
+    return {
+      success: false,
+      data: [],
+      message:
+        error instanceof Error ? error.message : "Unable to load your reviews.",
+    };
+  }
+}
